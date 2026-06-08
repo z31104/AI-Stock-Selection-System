@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+
+data/history.csv
+static/charts/*.png
+
+.vscode/
+.idea/

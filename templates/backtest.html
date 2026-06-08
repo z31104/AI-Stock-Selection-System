@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>回測系統</title>
+</head>
+<body>
+
+<h1>回測系統</h1>
+<link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+<div class="container"></div>
+
+<a href="/">回首頁</a>
+|
+<a href="/ranking">排行榜</a>
+
+<form method="POST" action="/backtest">
+
+    <p>
+        <label>本金：</label>
+        <input type="number" name="capital" value="1000000">
+    </p>
+
+    <p>
+        <label>開始日期：</label>
+        <input type="date" name="start_date" value="2025-04-01">
+    </p>
+
+    <p>
+        <label>持有天數：</label>
+        <input type="number" name="holding_days" value="30">
+    </p>
+
+    <button type="submit">開始回測</button>
+    
+</form>
+
+{% if results %}
+    <h2>回測結果</h2>
+
+    <p>本金：{{ capital }}</p>
+    <p>開始日期：{{ start_date }}</p>
+    <p>持有天數：{{ holding_days }}</p>
+    <p>總損益：{{ total_profit }}</p>
+
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>股票代號</th>
+            <th>股票名稱</th>
+            <th>評分</th>
+            <th>開始價</th>
+            <th>結束價</th>
+            <th>投入金額</th>
+            <th>報酬率</th>
+            <th>期末金額</th>
+            <th>損益</th>
+            <th>配置比例</th>
+        </tr>
+
+        {% for item in results %}
+        <tr>
+            <td>{{ item.code }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.score }}</td>
+            <td>{{ item.start_price }}</td>
+            <td>{{ item.end_price }}</td>
+            <td>{{ item.invest_amount }}</td>
+            <td>{{ item.return_rate }}%</td>
+            <td>{{ item.final_amount }}</td>
+            <td>{{ item.profit }}</td>
+            <td>{{ item.ratio }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+</body>
+</html>

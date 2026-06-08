@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>模擬投資</title>
+</head>
+<body>
+
+<h1>模擬投資</h1>
+ <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+<div class="container"></div>
+
+<a href="/">回首頁</a>
+|
+<a href="/ranking">排行榜</a>
+|
+<a href="/portfolio">投資配置</a>
+|
+<a href="/backtest">回測系統</a>
+
+<form method="POST">
+    <p>
+        <label>本金：</label>
+        <input type="number" name="capital" value="1000000">
+    </p>
+
+    <button type="submit">開始模擬投資</button>
+</form>
+
+{% if results %}
+    <h2>模擬投資結果</h2>
+
+    <p>本金：{{ capital }}</p>
+
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>股票代號</th>
+            <th>股票名稱</th>
+            <th>評分</th>
+            <th>目前股價</th>
+            <th>配置比例</th>
+            <th>投入金額</th>
+            <th>停損價</th>
+            <th>停利價</th>
+        </tr>
+
+        {% for item in results %}
+        <tr>
+            <td>{{ item.code }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.score }}</td>
+            <td>{{ item.price }}</td>
+            <td>{{ item.ratio }}%</td>
+            <td>{{ item.amount }}</td>
+            <td>{{ item.stop_loss_price }}</td>
+            <td>{{ item.take_profit_price }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+</body>
+</html>

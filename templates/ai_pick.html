@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 智慧選股推薦</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>AI 智慧選股推薦</h1>
+
+    <a href="/">回首頁</a>
+    |
+    <a href="/ranking">排行榜</a>
+    |
+    <a href="/portfolio">投資配置</a>
+
+    <hr>
+
+    <form method="POST" action="/ai_pick">
+
+        <p>
+            <label>本金：</label>
+            <input type="number" name="capital" value="1000000" required>
+        </p>
+
+        <p>
+            <label>風險類型：</label>
+            <select name="risk_type">
+                <option value="low">保守型</option>
+                <option value="medium" selected>穩健型</option>
+                <option value="high">積極型</option>
+            </select>
+        </p>
+
+        <button type="submit">產生 AI 推薦</button>
+
+    </form>
+
+    {% if ai_result %}
+
+        <hr>
+
+        <h2>AI 推薦股票</h2>
+
+        {% if ai_result.stocks %}
+
+            <table border="1" cellpadding="8">
+                <tr>
+                    <th>排名</th>
+                    <th>股票代號</th>
+                    <th>股票名稱</th>
+                    <th>產業</th>
+                    <th>綜合分數</th>
+                    <th>配置比例</th>
+                    <th>建議金額</th>
+                    <th>新聞趨勢</th>
+                    <th>風險等級</th>
+                    <th>推薦理由</th>
+                </tr>
+
+                {% for item in ai_result.stocks %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ item.code }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.industry }}</td>
+                    <td>{{ item.score }}</td>
+                    <td>{{ item.ratio }}%</td>
+                    <td>{{ item.amount }}</td>
+                    <td>{{ item.news_trend }}</td>
+                    <td>{{ item.risk_level }}</td>
+                    <td>{{ item.ai_reason }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+
+        {% else %}
+            <p style="color:red;">目前沒有可推薦的股票資料，請先回首頁查詢幾支股票。</p>
+        {% endif %}
+
+        <h2>AI 投資報告</h2>
+
+        <pre>{{ ai_result.report }}</pre>
+
+        {% if pdf_file %}
+        <p>
+            <a href="{{ url_for('static', filename=pdf_file) }}" target="_blank">
+                下載 AI 投資報告 PDF
+            </a>
+        </p>
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

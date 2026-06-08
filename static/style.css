@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, "Microsoft JhengHei", sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+}
+
+.nav a {
+    margin-right: 12px;
+    text-decoration: none;
+    color: #2563eb;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
+}
+
+td, th {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+button {
+    padding: 8px 18px;
+}
+
+input {
+    padding: 6px;
+}

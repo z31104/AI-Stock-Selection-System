@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 股票選股系統</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>AI 智慧股票選股系統</h1>
+     <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+    <div class="container"></div>
+
+    <div class="nav">
+        <a href="/history">查看查詢紀錄</a>
+        <a href="/ranking">查看股票排行榜</a>
+        <a href="/portfolio">投資配置</a>
+        <a href="/compare">股票比較</a>
+        <a href="/backtest">回測系統</a>
+        <a href="/simulation">模擬投資</a>
+        <a href="/ai_pick">AI 選股推薦</a>
+    </div>
+
+    <form method="POST">
+        <table cellpadding="10">
+            <tr>
+                <td>股票代號：</td>
+                <td><input type="text" name="stock"></td>
+            </tr>
+
+            <tr>
+                <td>最低評分：</td>
+                <td><input type="number" name="min_score" value="0"></td>
+            </tr>
+
+            <tr>
+                <td>RSI 小於：</td>
+                <td><input type="number" name="max_rsi" value="70"></td>
+            </tr>
+
+            <tr>
+                <td>技術條件：</td>
+                <td>
+                    <label>
+                        <input type="checkbox" name="above_ma5">
+                        必須站上 MA5
+                    </label>
+                </td>
+            </tr>
+
+            <tr>
+                <td>自訂停損％：</td>
+                <td><input type="number" name="stop_loss_rate" value="8"></td>
+            </tr>
+
+            <tr>
+                <td>自訂停利％：</td>
+                <td><input type="number" name="take_profit_rate" value="15"></td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td><button type="submit">查詢</button></td>
+            </tr>
+        </table>
+    </form>
+
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+
+    {% if result %}
+        <h2>查詢結果</h2>
+
+        <p>股票代號：{{ result.code }}</p>
+        <p>股票名稱：{{ result.name }}</p>
+        <p>產業分類：{{ result.industry }}</p>
+        <p>收盤價：{{ result.price }}</p>
+        <p>成交股數：{{ result.volume }}</p>
+
+        <h3>技術指標</h3>
+        <p>MA5：{{ result.ma5 }}</p>
+        <p>MA20：{{ result.ma20 }}</p>
+        <p>RSI：{{ result.rsi }}</p>
+        <p>K值：{{ result.k }}</p>
+        <p>D值：{{ result.d }}</p>
+        <p>成交量MA5：{{ result.volume_ma5 }}</p>
+
+        <h3>分析結果</h3>
+        <p>技術分數：{{ result.tech_score }} / 15</p>
+        <p>新聞分數：{{ result.news_score }}</p>
+        <p>綜合分數：{{ result.final_score }}</p>
+        <p>建議：{{ result.suggestion }}</p>
+
+        <h3>K線圖</h3>
+        <img src="{{ url_for('static', filename='charts/' + result.chart_file) }}" width="800">
+
+        <h3>新聞趨勢分析</h3>
+
+        <p>新聞分數：{{ result.news_score }}</p>
+        <p>新聞趨勢：{{ result.news_trend }}</p>
+        <p>新聞熱度：{{ result.news_heat }}</p>
+        <p>新聞題材：{{ result.news_topics }}</p>
+        <p>正向關鍵字：{{ result.positive_keywords }}</p>
+        <p>負向關鍵字：{{ result.negative_keywords }}</p>
+        <p>新聞建議：{{ result.news_advice }}</p>
+
+        <ul>
+            {% for news in result.news_list %}
+                <li>
+                    <a href="{{ news.link }}" target="_blank">
+                        {{ news.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h3>AI 分析文字</h3>
+        <pre>{{ result.ai_analysis }}</pre>
+
+        <h3>停損停利建議</h3>
+        <p>風險等級：{{ result.risk_level }}</p>
+        <p>自訂停損：{{ result.stop_loss_price }} 元（-{{ result.stop_loss_rate }}%）</p>
+        <p>自訂停利：{{ result.take_profit_price }} 元（+{{ result.take_profit_rate }}%）</p>
+        <p>系統建議：{{ result.risk_advice }}</p>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
