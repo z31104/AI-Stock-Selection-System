@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 股票助理</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>AI 股票助理</h1>
+
+    <a href="/">回首頁</a>
+
+    <hr>
+
+    <form method="POST">
+
+        <p>
+            <label>請輸入問題：</label>
+        </p>
+
+        <textarea
+            name="question"
+            rows="4"
+            cols="80"
+            placeholder="例如：2330可以買嗎？"
+        ></textarea>
+
+        <br><br>
+
+        <button type="submit">
+            詢問 AI
+        </button>
+
+    </form>
+
+    {% if answer %}
+
+    <hr>
+
+    <h2>AI 回答</h2>
+
+    <pre>{{ answer }}</pre>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

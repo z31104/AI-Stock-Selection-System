@@ -53,13 +53,16 @@
             <td>{{ item.news_score }}</td>
             <td>{{ item.final_score }}</td>
             <td>{{ item.news_trend }}</td>
-            <td>
-            <ul>
-            {% for news in item.news_titles.split(" | ") %}
-            <li>{{ news }}</li>
-            {% endfor %}
-        </ul>
-    </td>
+           <td>
+                {% if item.get('news_titles') %}
+                    {% for news in item.get('news_titles', '').split(' | ') %}
+                        <li>{{ news }}</li>
+                    {% endfor %}
+                {% else %}
+                    無新聞資料
+                {% endif %}
+            </td>
+</td>
         </tr>
         {% endfor %}
 

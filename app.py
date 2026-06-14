@@ -4,12 +4,15 @@ from services.stock_service import get_stock_data
 from services.indicator_service import add_indicators
 from services.score_service import calculate_score
 from services.chart_service import create_stock_chart
-from services.history_service import (
-    save_history,
-    get_history,
-    get_latest_history,
-    clear_history
+from services.chat_service import ask_stock_ai
+
+from services.db_service import (
+    init_db,
+    save_stock,
+    get_all_stocks,
+    get_latest_stocks
 )
+
 from services.portfolio_service import allocate_portfolio
 from services.ai_service import generate_ai_analysis
 from services.risk_service import get_risk_advice
@@ -19,7 +22,10 @@ from services.simulation_service import run_simulation
 from services.news_service import analyze_news_trend
 from services.ai_pick_service import get_ai_pick
 
+
+
 app = Flask(__name__)
+init_db()
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -123,7 +129,8 @@ def home():
                     ai_analysis = generate_ai_analysis(result)
                     result["ai_analysis"] = ai_analysis
 
-                    save_history(result)
+                  
+                    save_stock(result)
 
                 else:
                     error = "不符合選股條件"
@@ -137,7 +144,7 @@ def home():
 
 @app.route("/history")
 def history():
-    records = get_history()
+    records = get_latest_stocks()
     return render_template("history.html", records=records)
 
 
@@ -149,7 +156,7 @@ def clear_history_route():
 
 @app.route("/ranking")
 def ranking():
-    records = get_latest_history()
+    records = get_all_stocks()
 
     records = sorted(
         records,
@@ -165,7 +172,7 @@ def ranking():
 
 @app.route("/compare")
 def compare():
-    records = get_latest_history()
+    records = get_all_stocks()
     return render_template("compare.html", records=records)
 
 
@@ -184,7 +191,7 @@ def portfolio():
         invest_capital = capital * (1 - cash_ratio / 100)
         cash_amount = capital * (cash_ratio / 100)
 
-        records = get_latest_history()
+        records = get_all_stocks()
 
         portfolio_data = allocate_portfolio(
             records,
@@ -226,7 +233,7 @@ def backtest():
         start_date = request.form.get("start_date", "2025-04-01")
         holding_days = int(request.form.get("holding_days", 30))
 
-        records = get_latest_history()
+        records = get_latest_stocks()
 
         results = run_real_backtest(
             records,
@@ -260,7 +267,7 @@ def simulation():
     if request.method == "POST":
         capital = float(request.form.get("capital", 1000000))
 
-        records = get_latest_history()
+        records = get_latest_stocks()
         results = run_simulation(records, capital)
 
     return render_template(
@@ -280,7 +287,7 @@ def ai_pick():
         risk_type = request.form.get("risk_type", "medium")
         capital = float(request.form.get("capital", 1000000))
 
-        records = get_latest_history()
+        records = get_all_stocks()
 
         ai_result = get_ai_pick(
             records,
@@ -295,6 +302,27 @@ def ai_pick():
         pdf_file=pdf_file
     )
 
+
+@app.route("/chat", methods=["GET", "POST"])
+def chat():
+
+    answer = None
+
+    if request.method == "POST":
+
+        question = request.form.get("question", "")
+
+        records = get_latest_stocks()
+
+        answer = ask_stock_ai(
+            question,
+            records
+        )
+
+    return render_template(
+        "chat.html",
+        answer=answer
+    )
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

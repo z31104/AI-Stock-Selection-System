@@ -9,12 +9,17 @@ def get_ai_pick(records, capital, risk_type="medium"):
             item["score"] = score
             valid_records.append(item)
 
-    if len(valid_records) == 0:
-        return {
-            "stocks": [],
-            "report": "目前沒有可推薦的股票資料。請先查詢幾支股票。"
-        }
+        if len(valid_records) == 0:
+            return {
+                "stocks": [],
+                "report": "目前沒有可推薦的股票資料。請先查詢幾支股票。"
+            }
 
+        if len(valid_records) < 3:
+            return {
+                "stocks": [],
+                "report": "目前股票資料不足 3 檔，請先查詢更多股票再使用 AI 選股。"
+            }
     # 同一支股票只保留最新一筆
     latest_map = {}
 
@@ -36,9 +41,11 @@ def get_ai_pick(records, capital, risk_type="medium"):
     if risk_type == "low":
         selected = valid_records[:3]
         risk_name = "保守型"
+
     elif risk_type == "high":
-        selected = valid_records[:8]
+        selected = valid_records[:10]
         risk_name = "積極型"
+
     else:
         selected = valid_records[:5]
         risk_name = "穩健型"
@@ -57,6 +64,8 @@ def get_ai_pick(records, capital, risk_type="medium"):
     for item in selected:
         score = float(item.get("score", 0))
         ratio = score / total_score
+        if ratio > 0.4:
+            ratio = 0.4
 
         item["ratio"] = round(ratio * 100, 2)
         item["amount"] = round(capital * ratio, 0)
