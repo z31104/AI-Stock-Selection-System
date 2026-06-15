@@ -5,6 +5,11 @@ from services.indicator_service import add_indicators
 from services.score_service import calculate_score
 from services.chart_service import create_stock_chart
 from services.chat_service import ask_stock_ai
+from services.backtest_history_service import (
+    save_backtest_history,
+    get_backtest_history,
+    clear_backtest_history
+)
 
 from services.db_service import (
     init_db,
@@ -21,6 +26,7 @@ from services.backtest_service import run_real_backtest
 from services.simulation_service import run_simulation
 from services.news_service import analyze_news_trend
 from services.ai_pick_service import get_ai_pick
+from services.history_service import clear_history
 
 
 
@@ -227,6 +233,13 @@ def backtest():
     start_date = None
     holding_days = 30
     message = None
+    portfolio_dates = []
+    portfolio_values = []
+
+    best_stock = None
+    worst_stock = None
+    avg_return = None
+    win_rate = None
 
     if request.method == "POST":
         capital = float(request.form.get("capital", 1000000))
@@ -235,18 +248,58 @@ def backtest():
 
         records = get_latest_stocks()
 
-        results = run_real_backtest(
+        backtest_data = run_real_backtest(
             records,
             capital,
             start_date,
             holding_days
         )
 
+        if backtest_data is None:
+            backtest_data = {
+                "results": [],
+                "portfolio_dates": [],
+                "portfolio_values": []
+            }
+
+        results = backtest_data["results"]
+        portfolio_dates = backtest_data["portfolio_dates"]
+        portfolio_values = backtest_data["portfolio_values"]
+
         if len(results) == 0:
             message = "沒有回測結果，請換日期試試"
             total_profit = 0
+
         else:
             total_profit = sum(item["profit"] for item in results)
+
+            best_stock 
+
+            worst_stock = min(
+                results,
+                key=lambda x: x["return_rate"]
+            )
+
+            avg_return = round(
+                sum(item["return_rate"] for item in results)
+                / len(results),
+                2
+            )
+
+            win_rate = round(
+                len([x for x in results if x["return_rate"] > 0])
+                / len(results)
+                * 100,
+                2
+            )
+
+            save_backtest_history({
+                "start_date": start_date,
+                "capital": capital,
+                "holding_days": holding_days,
+                "total_profit": round(total_profit, 0),
+                "return_rate": round(total_profit / capital * 100, 2)
+            })
 
     return render_template(
         "backtest.html",
@@ -255,9 +308,14 @@ def backtest():
         capital=capital,
         start_date=start_date,
         holding_days=holding_days,
-        message=message
+        message=message,
+        portfolio_dates=portfolio_dates,
+        portfolio_values=portfolio_values,
+        best_stock=best_stock,
+        worst_stock=worst_stock,
+        avg_return=avg_return,
+        win_rate=win_rate
     )
-
 
 @app.route("/simulation", methods=["GET", "POST"])
 def simulation():
@@ -323,6 +381,28 @@ def chat():
         "chat.html",
         answer=answer
     )
+
+
+@app.route("/backtest_history")
+def backtest_history():
+    records = get_backtest_history()
+
+    return render_template(
+        "backtest_history.html",
+        records=records
+    )
+
+
+@app.route("/clear_backtest_history")
+def clear_backtest_history_route():
+
+    clear_backtest_history()
+
+    return render_template(
+        "backtest_history.html",
+        records=[]
+    )
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

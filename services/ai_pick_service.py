@@ -9,13 +9,13 @@ def get_ai_pick(records, capital, risk_type="medium"):
             item["score"] = score
             valid_records.append(item)
 
-        if len(valid_records) == 0:
+    if len(valid_records) == 0:
             return {
                 "stocks": [],
                 "report": "目前沒有可推薦的股票資料。請先查詢幾支股票。"
             }
 
-        if len(valid_records) < 3:
+    if len(valid_records) < 3:
             return {
                 "stocks": [],
                 "report": "目前股票資料不足 3 檔，請先查詢更多股票再使用 AI 選股。"

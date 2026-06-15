@@ -1,19 +1,14 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <title>回測系統</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>回測系統</h1>
-<link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-<div class="container"></div>
+{% block title %}
+回測系統
+{% endblock %}
 
-<a href="/">回首頁</a>
-|
-<a href="/ranking">排行榜</a>
+{% block content %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<h2>回測系統</h2>
 
 <form method="POST" action="/backtest">
 
@@ -33,16 +28,139 @@
     </p>
 
     <button type="submit">開始回測</button>
-    
+
 </form>
 
 {% if results %}
+<h2>回測統計</h2>
+
+<div class="stats-container">
+
+    <div class="stat-card">
+        <div class="stat-title">最佳股票</div>
+        <div class="stat-value">
+            {% if best_stock %}
+                {{ "%.2f"|format(best_stock.return_rate) }}%
+                <br>
+                {{ best_stock.code }}
+                {{ best_stock.name }}
+            {% else %}
+                無獲利股票
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-title">最差股票</div>
+        <div class="stat-value">
+            {{ "%.2f"|format(worst_stock.return_rate) }}%
+            <br>
+            {{ worst_stock.code }}
+            {{ worst_stock.name }}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-title">平均報酬率</div>
+        <div class="stat-value">
+            {{ avg_return }}%
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-title">勝率</div>
+        <div class="stat-value">
+            {{ win_rate }}%
+        </div>
+    </div>
+
+<div class="stat-card">
+    <div class="stat-title">總損益</div>
+
+    <div class="stat-value
+        {% if total_profit < 0 %}
+            loss
+        {% else %}
+            profit
+        {% endif %}
+    ">
+        {{ "{:,.0f}".format(total_profit) }}
+    </div>
+</div>
+    </div>
+
+<div class="stat-title">回測後資產</div>
+
+<div class="stat-card">
+    <div class="stat-title">回測後資產</div>
+
+    <div class="stat-value
+        {% if total_profit < 0 %}
+            loss
+        {% else %}
+            profit
+        {% endif %}
+    ">
+        {{ capital + total_profit }}
+    </div>
+</div>
+
+</div>
+
+<hr>
+
+<hr>
     <h2>回測結果</h2>
+    <h3>回測績效排行榜</h3>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>排名</th>
+        <th>股票代號</th>
+        <th>股票名稱</th>
+        <th>報酬率</th>
+    </tr>
+
+    {% for item in results|sort(attribute='return_rate', reverse=True) %}
+    <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ item.code }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.return_rate }}%</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<hr>
 
     <p>本金：{{ capital }}</p>
     <p>開始日期：{{ start_date }}</p>
     <p>持有天數：{{ holding_days }}</p>
     <p>總損益：{{ total_profit }}</p>
+    {% if portfolio_dates and portfolio_values %}
+
+    <h2>投資組合資產曲線</h2>
+
+    <canvas id="portfolioChart" height="100"></canvas>
+
+    <script>
+    new Chart(
+        document.getElementById("portfolioChart"),
+        {
+            type: "line",
+            data: {
+                labels: {{ portfolio_dates|tojson }},
+                datasets: [{
+                    label: "投資組合總資產",
+                    data: {{ portfolio_values|tojson }},
+                    tension: 0.3
+                }]
+            }
+        }
+    );
+    </script>
+
+{% endif %}
 
     <table border="1" cellpadding="8">
         <tr>
@@ -73,7 +191,32 @@
         </tr>
         {% endfor %}
     </table>
+
+    <h2>回測股價走勢圖</h2>
+
+    {% for item in results %}
+        <h3>{{ item.code }} {{ item.name }}</h3>
+
+        <canvas id="chart{{ loop.index }}" height="100"></canvas>
+
+        <script>
+        new Chart(
+            document.getElementById("chart{{ loop.index }}"),
+            {
+                type: "line",
+                data: {
+                    labels: {{ item.dates|tojson }},
+                    datasets: [{
+                        label: "{{ item.code }} 收盤價",
+                        data: {{ item.prices|tojson }},
+                        tension: 0.3
+                    }]
+                }
+            }
+        );
+        </script>
+    {% endfor %}
+
 {% endif %}
 
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>回測歷史紀錄</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>回測歷史紀錄</h1>
+
+    <a href="/">回首頁</a>
+    |
+    <a href="/backtest">回測系統</a>
+    |
+    <a href="/clear_backtest_history">
+        清除回測紀錄
+    </a>
+    <hr>
+
+    {% if records %}
+
+        <table border="1" cellpadding="8">
+            <tr>
+                <th>開始日期</th>
+                <th>本金</th>
+                <th>持有天數</th>
+                <th>總損益</th>
+                <th>總報酬率</th>
+            </tr>
+
+            {% for item in records %}
+            <tr>
+                <td>{{ item.start_date }}</td>
+                <td>{{ item.capital }}</td>
+                <td>{{ item.holding_days }}</td>
+                <td>{{ item.total_profit }}</td>
+                <td>{{ item.return_rate }}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    {% else %}
+
+        <p>目前沒有回測歷史紀錄。</p>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

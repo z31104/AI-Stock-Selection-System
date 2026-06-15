@@ -24,7 +24,11 @@ def get_month_stock_data(stock_code, month_date):
     df = pd.DataFrame(data["data"], columns=data["fields"])
 
     df["日期"] = df["日期"].apply(
-        lambda x: str(int(x.split("/")[0]) + 1911) + "-" + x.split("/")[1] + "-" + x.split("/")[2]
+        lambda x: str(int(x.split("/")[0]) + 1911)
+        + "-"
+        + x.split("/")[1]
+        + "-"
+        + x.split("/")[2]
     )
 
     df["日期"] = pd.to_datetime(df["日期"])
@@ -61,7 +65,6 @@ def get_backtest_data(stock_code, start_date, holding_days=30):
         (all_df["日期"] >= start) &
         (all_df["日期"] <= end)
     ]
-    
 
     if len(all_df) < 2:
         return None
@@ -70,8 +73,12 @@ def get_backtest_data(stock_code, start_date, holding_days=30):
 
 
 def run_real_backtest(records, capital, start_date, holding_days=30):
-    if len(records) == 0:
-        return []
+    if records is None or len(records) == 0:
+        return {
+            "results": [],
+            "portfolio_dates": [],
+            "portfolio_values": []
+        }
 
     selected = sorted(
         records,
@@ -85,9 +92,14 @@ def run_real_backtest(records, capital, start_date, holding_days=30):
     )
 
     if total_score == 0:
-        return []
+        return {
+            "results": [],
+            "portfolio_dates": [],
+            "portfolio_values": []
+        }
 
     results = []
+    portfolio_map = {}
 
     for item in selected:
         stock_code = str(item["code"]).replace(".0", "")
@@ -113,7 +125,23 @@ def run_real_backtest(records, capital, start_date, holding_days=30):
         final_amount = invest_amount * (1 + return_rate)
         profit = final_amount - invest_amount
 
+        # 計算這檔股票每天的資產價值
+        daily_values = []
+
+        for _, row in df.iterrows():
+            date_text = row["日期"].strftime("%Y-%m-%d")
+            price = row["收盤價"]
+
+            value = invest_amount * (price / start_price)
+            daily_values.append(round(value, 0))
+
+            if date_text not in portfolio_map:
+                portfolio_map[date_text] = 0
+
+            portfolio_map[date_text] += value
+
         result = {
+            "equity_point": round(final_amount, 0),
             "code": stock_code,
             "name": item["name"],
             "score": score,
@@ -124,9 +152,23 @@ def run_real_backtest(records, capital, start_date, holding_days=30):
             "return_rate": round(return_rate * 100, 2),
             "final_amount": round(final_amount, 0),
             "profit": round(profit, 0),
-            "holding_days": holding_days
+            "holding_days": holding_days,
+            "dates": df["日期"].dt.strftime("%Y-%m-%d").tolist(),
+            "prices": df["收盤價"].tolist(),
+            "daily_values": daily_values
         }
 
         results.append(result)
 
-    return results
+    portfolio_dates = sorted(portfolio_map.keys())
+
+    portfolio_values = [
+        round(portfolio_map[date], 0)
+        for date in portfolio_dates
+    ]
+
+    return {
+        "results": results,
+        "portfolio_dates": portfolio_dates,
+        "portfolio_values": portfolio_values
+    }

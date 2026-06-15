@@ -37,3 +37,40 @@ button {
 input {
     padding: 6px;
 }
+
+/* 回測統計卡片 */
+
+.stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    width: 250px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.stat-title {
+    font-size: 14px;
+    color: #666;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.profit {
+    color: red;
+}
+
+.loss {
+    color: green;
+}
