@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request
+from flask import send_file
+import pandas as pd
 
 from services.stock_service import get_stock_data
 from services.indicator_service import add_indicators
@@ -8,7 +10,8 @@ from services.chat_service import ask_stock_ai
 from services.backtest_history_service import (
     save_backtest_history,
     get_backtest_history,
-    clear_backtest_history
+    clear_backtest_history,
+    get_latest_backtest
 )
 
 from services.db_service import (
@@ -39,12 +42,34 @@ def home():
     result = None
     error = None
 
+    dashboard_records = get_latest_stocks()
+    latest_backtest = get_latest_backtest()
+
+    top_stocks = sorted(
+        dashboard_records,
+        key=lambda x: float(x.get("score", 0)),
+        reverse=True
+    )[:5]
+
+    ai_recommend = top_stocks[:3]
+    stock_count = len(dashboard_records)
+    total_queries = len(get_all_stocks())
+    
+
     if request.method == "POST":
         stock_code = request.form["stock"].strip()
         if stock_code == "":
             error = "請輸入股票代號"
-            return render_template("index.html", result=result, error=error)
-
+            return render_template(
+    "index.html",
+    result=result,
+    error=error,
+    top_stocks=top_stocks,
+    stock_count=stock_count,
+    latest_backtest=latest_backtest,
+    ai_recommend=ai_recommend,
+    total_queries=total_queries
+)
         if not stock_code.isdigit():
             error = "股票代號只能輸入數字"
             return render_template("index.html", result=result, error=error)
@@ -144,9 +169,13 @@ def home():
     return render_template(
         "index.html",
         result=result,
-        error=error
-    )
-
+        error=error,
+        top_stocks=top_stocks,
+        stock_count=stock_count,
+        latest_backtest=latest_backtest,
+        ai_recommend=ai_recommend,
+        total_queries=total_queries
+)
 
 @app.route("/history")
 def history():
@@ -273,7 +302,10 @@ def backtest():
         else:
             total_profit = sum(item["profit"] for item in results)
 
-            best_stock 
+            best_stock = max(
+                results,
+                key=lambda x: x["return_rate"]
+            )
 
             worst_stock = min(
                 results,
@@ -403,6 +435,28 @@ def clear_backtest_history_route():
         records=[]
     )
 
+@app.route("/export_backtest")
+def export_backtest():
+
+    records = get_backtest_history()
+
+    if len(records) == 0:
+        return "沒有回測資料"
+
+    df = pd.DataFrame(records)
+
+    file_path = "data/backtest_report.csv"
+
+    df.to_csv(
+        file_path,
+        index=False,
+        encoding="utf-8-sig"
+    )
+
+    return send_file(
+        file_path,
+        as_attachment=True
+    )
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

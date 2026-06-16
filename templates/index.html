@@ -1,79 +1,221 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <title>AI 股票選股系統</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <h1>AI 智慧股票選股系統</h1>
-     <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-    <div class="container"></div>
+        <h1>AI 智慧股票選股系統</h1>
 
-    <div class="nav">
-        <a href="/history">查看查詢紀錄</a>
-        <a href="/ranking">查看股票排行榜</a>
-        <a href="/chat">AI股票助理</a>
-        <a href="/portfolio">投資配置</a>
-        <a href="/compare">股票比較</a>
-        <a href="/backtest">回測系統</a>
-        <a href="/simulation">模擬投資</a>
-        <a href="/ai_pick">AI 選股推薦</a>
-    </div>
+        <div class="nav">
+            <a href="/history">查看查詢紀錄</a>
+            <a href="/ranking">查看股票排行榜</a>
+            <a href="/chat">AI股票助理</a>
+            <a href="/portfolio">投資配置</a>
+            <a href="/compare">股票比較</a>
+            <a href="/backtest">回測系統</a>
+            <a href="/simulation">模擬投資</a>
+            <a href="/ai_pick">AI 選股推薦</a>
+        </div>
 
-    <form method="POST">
-        <table cellpadding="10">
+
+        <h2>系統 Dashboard</h2>
+
+        <div class="stats-container">
+
+            <div class="stat-card">
+                <div class="stat-title">目前股票數量</div>
+                <div class="stat-value">
+                    {{ stock_count }}
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">排行榜第一名</div>
+                <div class="stat-value">
+                    {% if top_stocks %}
+                    {{ top_stocks[0].code }}
+                    <br>
+                    {{ top_stocks[0].name }}
+                    {% else %}
+                    尚無資料
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">總查詢次數</div>
+                <div class="stat-value">
+                    {{ total_queries }}
+                </div>
+            </div>
+
+        </div>
+
+        <h2>🏆 今日最強股票 TOP 5</h2>
+
+        {% if top_stocks %}
+        <table border="1" cellpadding="8">
+
             <tr>
-                <td>股票代號：</td>
-                <td><input type="text" name="stock"></td>
+                <th>排名</th>
+                <th>股票代號</th>
+                <th>股票名稱</th>
+                <th>綜合分數</th>
             </tr>
 
+            {% for item in top_stocks %}
             <tr>
-                <td>最低評分：</td>
-                <td><input type="number" name="min_score" value="0"></td>
-            </tr>
-
-            <tr>
-                <td>RSI 小於：</td>
-                <td><input type="number" name="max_rsi" value="70"></td>
-            </tr>
-
-            <tr>
-                <td>技術條件：</td>
                 <td>
-                    <label>
-                        <input type="checkbox" name="above_ma5">
-                        必須站上 MA5
-                    </label>
+                    {% if loop.index == 1 %}
+                    🥇
+                    {% elif loop.index == 2 %}
+                    🥈
+                    {% elif loop.index == 3 %}
+                    🥉
+                    {% else %}
+                    {{ loop.index }}
+                    {% endif %}
+                </td>
+                <td>{{ item.code }}</td>
+                <td>{{ item.name }}</td>
+                <td>
+                    {% if item.score >= 10 %}
+                    <span class="profit">{{ item.score }}</span>
+                    {% else %}
+                    <span class="loss">{{ item.score }}</span>
+                    {% endif %}
                 </td>
             </tr>
+            {% endfor %}
 
-            <tr>
-                <td>自訂停損％：</td>
-                <td><input type="number" name="stop_loss_rate" value="8"></td>
-            </tr>
-
-            <tr>
-                <td>自訂停利％：</td>
-                <td><input type="number" name="take_profit_rate" value="15"></td>
-            </tr>
-
-            <tr>
-                <td></td>
-                <td><button type="submit">查詢</button></td>
-            </tr>
         </table>
-    </form>
+        {% endif %}
+        <h2>📈 最近一次回測</h2>
 
-    {% if error %}
+        {% if latest_backtest %}
+
+        <div class="stat-card">
+
+            <p>
+                開始日期：
+                {{ latest_backtest.start_date }}
+            </p>
+
+            <p>
+                本金：
+                {{ "{:,.0f}".format(latest_backtest.capital) }}
+            </p>
+
+            <p>
+                持有天數：
+                {{ latest_backtest.holding_days }}
+            </p>
+
+            <p>
+                總損益：
+                {{ "{:,.0f}".format(latest_backtest.total_profit) }}
+            </p>
+
+            <p>
+                報酬率：
+                {{ "%.2f"|format(latest_backtest.return_rate) }}%
+            </p>
+
+        </div>
+
+        {% else %}
+
+        <p>目前沒有回測紀錄。</p>
+
+        {% endif %}
+
+        <h2>🤖 AI 推薦股票</h2>
+
+        {% if ai_recommend %}
+
+        <div class="stats-container">
+
+            {% for stock in ai_recommend %}
+
+            <div class="stat-card">
+
+                <div class="stat-title">
+                    推薦股票 {{ loop.index }}
+                </div>
+
+                <div class="stat-value">
+                    {{ stock.code }}
+                    <br>
+                    {{ stock.name }}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+        <hr>
+
+        <hr>
+
+        <form method="POST">
+            <table cellpadding="10">
+                <tr>
+                    <td>股票代號：</td>
+                    <td><input type="text" name="stock"></td>
+                </tr>
+
+                <tr>
+                    <td>最低評分：</td>
+                    <td><input type="number" name="min_score" value="0"></td>
+                </tr>
+
+                <tr>
+                    <td>RSI 小於：</td>
+                    <td><input type="number" name="max_rsi" value="70"></td>
+                </tr>
+
+                <tr>
+                    <td>技術條件：</td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="above_ma5">
+                            必須站上 MA5
+                        </label>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>自訂停損％：</td>
+                    <td><input type="number" name="stop_loss_rate" value="8"></td>
+                </tr>
+
+                <tr>
+                    <td>自訂停利％：</td>
+                    <td><input type="number" name="take_profit_rate" value="15"></td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td><button type="submit">查詢</button></td>
+                </tr>
+            </table>
+        </form>
+
+        {% if error %}
         <p style="color:red;">{{ error }}</p>
-    {% endif %}
+        {% endif %}
 
-    {% if result %}
+        {% if result %}
         <h2>查詢結果</h2>
 
         <p>股票代號：{{ result.code }}</p>
@@ -111,11 +253,11 @@
 
         <ul>
             {% for news in result.news_list %}
-                <li>
-                    <a href="{{ news.link }}" target="_blank">
-                        {{ news.title }}
-                    </a>
-                </li>
+            <li>
+                <a href="{{ news.link }}" target="_blank">
+                    {{ news.title }}
+                </a>
+            </li>
             {% endfor %}
         </ul>
 
@@ -127,9 +269,10 @@
         <p>自訂停損：{{ result.stop_loss_price }} 元（-{{ result.stop_loss_rate }}%）</p>
         <p>自訂停利：{{ result.take_profit_price }} 元（+{{ result.take_profit_rate }}%）</p>
         <p>系統建議：{{ result.risk_advice }}</p>
-    {% endif %}
+        {% endif %}
 
-</div>
+    </div>
 
 </body>
+
 </html>

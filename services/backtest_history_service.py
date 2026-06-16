@@ -31,6 +31,11 @@ def get_backtest_history():
         encoding="utf-8-sig"
     )
 
+    df = df.sort_values(
+    by="start_date",
+    ascending=False
+)
+
     return df.to_dict("records")
 
 def clear_backtest_history():
@@ -40,3 +45,13 @@ def clear_backtest_history():
 
     if os.path.isfile(file_path):
         os.remove(file_path)
+
+
+def get_latest_backtest():
+
+    records = get_backtest_history()
+
+    if len(records) == 0:
+        return None
+
+    return records[0]

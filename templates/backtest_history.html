@@ -1,29 +1,34 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <title>回測歷史紀錄</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <h1>回測歷史紀錄</h1>
+        <h1>回測歷史紀錄</h1>
+        <p>
+            <a href="/export_backtest">
+                匯出 CSV 報告
+            </a>
+        </p>
 
-    <a href="/">回首頁</a>
-    |
-    <a href="/backtest">回測系統</a>
-    |
-    <a href="/clear_backtest_history">
-        清除回測紀錄
-    </a>
-    <hr>
+        <a href="/">回首頁</a>
+        |
+        <a href="/backtest">回測系統</a>
+        |
+        <a href="/clear_backtest_history">
+            清除回測紀錄
+        </a>
+        <hr>
 
-    {% if records %}
+        {% if records %}
 
         <table border="1" cellpadding="8">
             <tr>
@@ -45,13 +50,14 @@
             {% endfor %}
         </table>
 
-    {% else %}
+        {% else %}
 
         <p>目前沒有回測歷史紀錄。</p>
 
-    {% endif %}
+        {% endif %}
 
-</div>
+    </div>
 
 </body>
+
 </html>

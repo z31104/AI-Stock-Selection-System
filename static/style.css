@@ -25,7 +25,8 @@ table {
     margin-top: 15px;
 }
 
-td, th {
+td,
+th {
     border: 1px solid #ddd;
     padding: 10px;
 }
@@ -53,7 +54,7 @@ input {
     padding: 15px;
     width: 250px;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .stat-title {
@@ -69,8 +70,10 @@ input {
 
 .profit {
     color: red;
+    font-weight: bold;
 }
 
 .loss {
     color: green;
+    font-weight: bold;
 }
