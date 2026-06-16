@@ -1,0 +1,7 @@
+.venv
+__pycache__
+*.pyc
+.git
+data/stock.db
+data/backtest_report.csv
+static/charts/*.png

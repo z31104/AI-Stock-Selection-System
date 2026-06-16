@@ -1,0 +1,22 @@
+services:
+  stock-ai:
+    build: .
+    container_name: stock_ai_system
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./data:/app/data
+      - ./static/charts:/app/static/charts
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    container_name: stock_ai_redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
