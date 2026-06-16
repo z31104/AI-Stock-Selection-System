@@ -3,63 +3,114 @@ body {
     background-color: #f4f6f8;
     margin: 0;
     padding: 30px;
+    color: #1f2937;
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 1100px;
     margin: auto;
     background-color: white;
     padding: 30px;
     border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
 }
 
-.nav a {
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 30px;
+    border-left: 5px solid #2563eb;
+    padding-left: 10px;
+}
+
+.nav {
+    margin: 15px 0 25px 0;
+}
+
+.nav a,
+a {
     margin-right: 12px;
     text-decoration: none;
     color: #2563eb;
+    font-weight: bold;
+}
+
+.nav a:hover,
+a:hover {
+    text-decoration: underline;
 }
 
 table {
     border-collapse: collapse;
     width: 100%;
     margin-top: 15px;
+    background: white;
 }
 
 td,
 th {
     border: 1px solid #ddd;
     padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #f1f5f9;
 }
 
 button {
-    padding: 8px 18px;
+    padding: 9px 20px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
-input {
-    padding: 6px;
+button:hover {
+    background-color: #1d4ed8;
 }
 
-/* 回測統計卡片 */
+input,
+select,
+textarea {
+    padding: 7px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+pre {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+}
+
+/* Dashboard / 統計卡片 */
 
 .stats-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 18px;
     margin: 20px 0;
 }
 
 .stat-card {
-    background: white;
-    border-radius: 10px;
-    padding: 15px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 18px;
     width: 250px;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.10);
+    border: 1px solid #eef2f7;
 }
 
 .stat-title {
     font-size: 14px;
-    color: #666;
+    color: #6b7280;
+    margin-bottom: 8px;
 }
 
 .stat-value {
@@ -67,6 +118,8 @@ input {
     font-weight: bold;
     margin-top: 8px;
 }
+
+/* 台股配色：紅漲綠跌 */
 
 .profit {
     color: red;
@@ -76,4 +129,45 @@ input {
 .loss {
     color: green;
     font-weight: bold;
+}
+
+/* 表單區塊 */
+
+form {
+    margin-top: 20px;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* 圖片與圖表 */
+
+img {
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+canvas {
+    background: white;
+    margin-top: 10px;
+}
+
+/* 手機版 */
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 18px;
+    }
+
+    .stat-card {
+        width: 100%;
+    }
+
+    table {
+        font-size: 14px;
+    }
 }
