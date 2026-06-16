@@ -60,28 +60,48 @@ def home():
         stock_code = request.form["stock"].strip()
         if stock_code == "":
             error = "請輸入股票代號"
+
             return render_template(
-    "index.html",
-    result=result,
-    error=error,
-    top_stocks=top_stocks,
-    stock_count=stock_count,
-    latest_backtest=latest_backtest,
-    ai_recommend=ai_recommend,
-    total_queries=total_queries
-)
+            "index.html",
+            result=result,
+            error=error,
+            top_stocks=top_stocks,
+            stock_count=stock_count,
+            latest_backtest=latest_backtest,
+            ai_recommend=ai_recommend,
+            total_queries=total_queries
+        )
+
         if not stock_code.isdigit():
             error = "股票代號只能輸入數字"
-            return render_template("index.html", result=result, error=error)
-        min_score = int(request.form.get("min_score", 0))
-        max_rsi = float(request.form.get("max_rsi", 70))
-        above_ma5 = "above_ma5" in request.form
-        stop_loss_rate = float(request.form.get("stop_loss_rate", 8))
-        take_profit_rate = float(request.form.get("take_profit_rate", 15))
+            return render_template(
+            "index.html",
+            result=result,
+            error=error,
+            top_stocks=top_stocks,
+            stock_count=stock_count,
+            latest_backtest=latest_backtest,
+            ai_recommend=ai_recommend,
+            total_queries=total_queries
+            )
+            min_score = int(request.form.get("min_score", 0))
+            max_rsi = float(request.form.get("max_rsi", 70))
+            above_ma5 = "above_ma5" in request.form
+            stop_loss_rate = float(request.form.get("stop_loss_rate", 8))
+            take_profit_rate = float(request.form.get("take_profit_rate", 15))
 
-        stock_data, error = get_stock_data(stock_code)
+            stock_data, error = get_stock_data(stock_code)
         if error:
-            return render_template("index.html", result=result, error=error)
+            return render_template(
+            "index.html",
+            result=result,
+            error=error,
+            top_stocks=top_stocks,
+            stock_count=stock_count,
+            latest_backtest=latest_backtest,
+            ai_recommend=ai_recommend,
+            total_queries=total_queries
+            )
 
         if stock_data:
             df = stock_data["df"]
@@ -167,15 +187,15 @@ def home():
                     error = "不符合選股條件"
 
     return render_template(
-        "index.html",
-        result=result,
-        error=error,
-        top_stocks=top_stocks,
-        stock_count=stock_count,
-        latest_backtest=latest_backtest,
-        ai_recommend=ai_recommend,
-        total_queries=total_queries
-)
+            "index.html",
+            result=result,
+            error=error,
+            top_stocks=top_stocks,
+            stock_count=stock_count,
+            latest_backtest=latest_backtest,
+            ai_recommend=ai_recommend,
+            total_queries=total_queries
+        )
 
 @app.route("/history")
 def history():
@@ -417,12 +437,47 @@ def chat():
 
 @app.route("/backtest_history")
 def backtest_history():
+
     records = get_backtest_history()
 
+    start_date = request.args.get("start_date", "")
+    min_return = request.args.get("min_return", "")
+
+    if min_return:
+
+        records = [
+            item
+            for item in records
+            if float(item.get("return_rate", 0))
+            >= float(min_return)
+        ]
+
+    total_count = len(records)
+
+    if total_count > 0:
+        best_return = max(
+            float(item.get("return_rate", 0))
+            for item in records
+        )
+
+        avg_return = round(
+            sum(
+                float(item.get("return_rate", 0))
+                for item in records
+            ) / total_count,
+            2
+        )
+    else:
+        best_return = 0
+        avg_return = 0
+
     return render_template(
-        "backtest_history.html",
-        records=records
-    )
+    "backtest_history.html",
+    records=records,
+    total_count=total_count,
+    best_return=best_return,
+    avg_return=avg_return
+)
 
 
 @app.route("/clear_backtest_history")

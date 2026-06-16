@@ -13,6 +13,59 @@
     <div class="container">
 
         <h1>回測歷史紀錄</h1>
+        <form method="GET">
+
+            <label>開始日期：</label>
+
+            <input type="date" name="start_date" value="{{ request.args.get('start_date', '') }}">
+
+            <label>最低報酬率：</label>
+
+            <input type="text" name="min_return" placeholder="例如 10" value="{{ request.args.get('min_return', '') }}">
+
+            %
+
+            <button type="submit">
+                搜尋
+            </button>
+
+        </form>
+
+        <div class="stats-container">
+
+            <div class="stat-card">
+                <div class="stat-title">
+                    總回測次數
+                </div>
+
+                <div class="stat-value">
+                    {{ total_count }}
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">
+                    最佳報酬率
+                </div>
+
+                <div class="stat-value profit">
+                    {{ best_return }}%
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">
+                    平均報酬率
+                </div>
+
+                <div class="stat-value">
+                    {{ avg_return }}%
+                </div>
+            </div>
+
+        </div>
+
+        <hr>
         <p>
             <a href="/export_backtest">
                 匯出 CSV 報告
