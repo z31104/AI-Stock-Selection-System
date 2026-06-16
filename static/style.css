@@ -171,3 +171,8 @@ canvas {
         font-size: 14px;
     }
 }
+
+.best-row {
+    background-color: #fff3cd;
+    font-weight: bold;
+}

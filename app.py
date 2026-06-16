@@ -44,6 +44,14 @@ def home():
 
     dashboard_records = get_latest_stocks()
     latest_backtest = get_latest_backtest()
+    backtest_records = get_backtest_history()
+
+    chart_labels = []
+    chart_values = []
+
+    for item in backtest_records[:10]:
+        chart_labels.append(item["start_date"])
+        chart_values.append(float(item["return_rate"]))
 
     top_stocks = sorted(
         dashboard_records,
@@ -54,36 +62,19 @@ def home():
     ai_recommend = top_stocks[:3]
     stock_count = len(dashboard_records)
     total_queries = len(get_all_stocks())
-    
+    stock_code = request.args.get("stock", "")
 
-    if request.method == "POST":
-        stock_code = request.form["stock"].strip()
+    if request.method == "POST" or stock_code:
+        if request.method == "POST":
+            stock_code = request.form["stock"].strip()
+
         if stock_code == "":
             error = "請輸入股票代號"
 
-            return render_template(
-            "index.html",
-            result=result,
-            error=error,
-            top_stocks=top_stocks,
-            stock_count=stock_count,
-            latest_backtest=latest_backtest,
-            ai_recommend=ai_recommend,
-            total_queries=total_queries
-        )
-
-        if not stock_code.isdigit():
+        elif not stock_code.isdigit():
             error = "股票代號只能輸入數字"
-            return render_template(
-            "index.html",
-            result=result,
-            error=error,
-            top_stocks=top_stocks,
-            stock_count=stock_count,
-            latest_backtest=latest_backtest,
-            ai_recommend=ai_recommend,
-            total_queries=total_queries
-            )
+
+        else:
             min_score = int(request.form.get("min_score", 0))
             max_rsi = float(request.form.get("max_rsi", 70))
             above_ma5 = "above_ma5" in request.form
@@ -91,111 +82,101 @@ def home():
             take_profit_rate = float(request.form.get("take_profit_rate", 15))
 
             stock_data, error = get_stock_data(stock_code)
-        if error:
-            return render_template(
-            "index.html",
-            result=result,
-            error=error,
-            top_stocks=top_stocks,
-            stock_count=stock_count,
-            latest_backtest=latest_backtest,
-            ai_recommend=ai_recommend,
-            total_queries=total_queries
-            )
 
-        if stock_data:
-            df = stock_data["df"]
-            df = add_indicators(df)
+            if stock_data:
+                df = stock_data["df"]
+                df = add_indicators(df)
 
-            if len(df) == 0:
-                error = "資料不足，無法計算技術指標"
-            else:
-                latest = df.iloc[-1]
-
-                tech_score, suggestion = calculate_score(latest)
-                industry = get_industry(stock_code)
-
-                is_valid = True
-
-                if tech_score < min_score:
-                    is_valid = False
-
-                if latest["RSI"] > max_rsi:
-                    is_valid = False
-
-                if above_ma5 and latest["收盤價"] < latest["MA5"]:
-                    is_valid = False
-
-                if is_valid:
-                    chart_file = create_stock_chart(df, stock_code)
-
-                    news_result = analyze_news_trend(
-                        stock_code,
-                        stock_data["stock_name"]
-                    )
-
-                    final_score = tech_score + news_result["news_score"]
-
-                    result = {
-                        "code": stock_code,
-                        "name": stock_data["stock_name"],
-                        "price": latest["收盤價"],
-                        "industry": industry,
-                        "volume": int(latest["成交股數"]),
-                        "ma5": round(latest["MA5"], 2),
-                        "ma20": round(latest["MA20"], 2),
-                        "rsi": round(latest["RSI"], 2),
-                        "k": round(latest["K"], 2),
-                        "d": round(latest["D"], 2),
-                        "volume_ma5": int(latest["成交量MA5"]),
-
-                        "tech_score": tech_score,
-                        "news_score": news_result["news_score"],
-                        "final_score": final_score,
-                        "score": final_score,
-
-                        "suggestion": suggestion,
-                        "chart_file": chart_file,
-
-                        "news_trend": news_result["news_trend"],
-                        "news_list": news_result["news_list"],
-                        "news_titles": " | ".join(
-                            [news["title"] for news in news_result["news_list"]]
-                        ),
-
-                        "news_heat": news_result["news_heat"],
-                        "news_topics": news_result["news_topics"],
-                        "positive_keywords": news_result["positive_keywords"],
-                        "negative_keywords": news_result["negative_keywords"],
-                        "news_advice": news_result["news_advice"]
-                    }
-
-                    risk_advice = get_risk_advice(
-                        result,
-                        stop_loss_rate,
-                        take_profit_rate
-                    )
-                    result.update(risk_advice)
-
-                    ai_analysis = generate_ai_analysis(result)
-                    result["ai_analysis"] = ai_analysis
-
-                  
-                    save_stock(result)
-
+                if len(df) == 0:
+                    error = "資料不足，無法計算技術指標"
                 else:
-                    error = "不符合選股條件"
+                    latest = df.iloc[-1]
+
+                    tech_score, suggestion = calculate_score(latest)
+                    industry = get_industry(stock_code)
+
+                    is_valid = True
+
+                    if tech_score < min_score:
+                        is_valid = False
+
+                    if latest["RSI"] > max_rsi:
+                        is_valid = False
+
+                    if above_ma5 and latest["收盤價"] < latest["MA5"]:
+                        is_valid = False
+
+                    if is_valid:
+                        chart_file = create_stock_chart(df, stock_code)
+
+                        news_result = analyze_news_trend(
+                            stock_code,
+                            stock_data["stock_name"]
+                        )
+
+                        final_score = tech_score + news_result["news_score"]
+
+                        result = {
+                            "code": stock_code,
+                            "name": stock_data["stock_name"],
+                            "price": latest["收盤價"],
+                            "industry": industry,
+                            "volume": int(latest["成交股數"]),
+                            "ma5": round(latest["MA5"], 2),
+                            "ma20": round(latest["MA20"], 2),
+                            "rsi": round(latest["RSI"], 2),
+                            "k": round(latest["K"], 2),
+                            "d": round(latest["D"], 2),
+                            "volume_ma5": int(latest["成交量MA5"]),
+
+                            "tech_score": tech_score,
+                            "news_score": news_result["news_score"],
+                            "final_score": final_score,
+                            "score": final_score,
+
+                            "suggestion": suggestion,
+                            "chart_file": chart_file,
+
+                            "news_trend": news_result["news_trend"],
+                            "news_list": news_result["news_list"],
+                            "news_titles": " | ".join(
+                                [news["title"] for news in news_result["news_list"]]
+                            ),
+
+                            "news_heat": news_result["news_heat"],
+                            "news_topics": news_result["news_topics"],
+                            "positive_keywords": news_result["positive_keywords"],
+                            "negative_keywords": news_result["negative_keywords"],
+                            "news_advice": news_result["news_advice"]
+                        }
+
+                        risk_advice = get_risk_advice(
+                            result,
+                            stop_loss_rate,
+                            take_profit_rate
+                        )
+                        result.update(risk_advice)
+
+                        ai_analysis = generate_ai_analysis(result)
+                        result["ai_analysis"] = ai_analysis
+
+                        save_stock(result)
+
+                    else:
+                        error = "不符合選股條件"
 
     return render_template(
-            "index.html",
-            result=result,
-            error=error,
-            top_stocks=top_stocks,
-            stock_count=stock_count,
-            latest_backtest=latest_backtest,
-            ai_recommend=ai_recommend,
-            total_queries=total_queries
-        )
+        "index.html",
+        result=result,
+        error=error,
+        top_stocks=top_stocks,
+        stock_count=stock_count,
+        latest_backtest=latest_backtest,
+        ai_recommend=ai_recommend,
+        total_queries=total_queries,
+        chart_labels=chart_labels,
+        chart_values=chart_values
+    )
 
 @app.route("/history")
 def history():
@@ -442,6 +423,7 @@ def backtest_history():
 
     start_date = request.args.get("start_date", "")
     min_return = request.args.get("min_return", "")
+    sort_by = request.args.get("sort_by", "")
 
     if min_return:
 
@@ -453,6 +435,23 @@ def backtest_history():
         ]
 
     total_count = len(records)
+
+   
+
+    if sort_by == "return_desc":
+
+            records = sorted(
+                records,
+                key=lambda x: float(x.get("return_rate", 0)),
+                reverse=True
+            )
+
+    elif sort_by == "return_asc":
+
+            records = sorted(
+                records,
+                key=lambda x: float(x.get("return_rate", 0))
+            )
 
     if total_count > 0:
         best_return = max(

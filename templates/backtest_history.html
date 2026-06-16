@@ -13,6 +13,7 @@
     <div class="container">
 
         <h1>回測歷史紀錄</h1>
+
         <form method="GET">
 
             <label>開始日期：</label>
@@ -24,6 +25,22 @@
             <input type="text" name="min_return" placeholder="例如 10" value="{{ request.args.get('min_return', '') }}">
 
             %
+
+            <label>排序方式：</label>
+
+            <select name="sort_by">
+                <option value="" {% if request.args.get('sort_by', '' )=='' %}selected{% endif %}>
+                    最新回測
+                </option>
+
+                <option value="return_desc" {% if request.args.get('sort_by', '' )=='return_desc' %}selected{% endif %}>
+                    報酬率最高
+                </option>
+
+                <option value="return_asc" {% if request.args.get('sort_by', '' )=='return_asc' %}selected{% endif %}>
+                    報酬率最低
+                </option>
+            </select>
 
             <button type="submit">
                 搜尋
@@ -49,7 +66,7 @@
                 </div>
 
                 <div class="stat-value profit">
-                    {{ best_return }}%
+                    {{ "%.2f"|format(best_return) }}%
                 </div>
             </div>
 
@@ -59,13 +76,14 @@
                 </div>
 
                 <div class="stat-value">
-                    {{ avg_return }}%
+                    {{ "%.2f"|format(avg_return) }}%
                 </div>
             </div>
 
         </div>
 
         <hr>
+
         <p>
             <a href="/export_backtest">
                 匯出 CSV 報告
@@ -79,6 +97,7 @@
         <a href="/clear_backtest_history">
             清除回測紀錄
         </a>
+
         <hr>
 
         {% if records %}
@@ -93,12 +112,13 @@
             </tr>
 
             {% for item in records %}
-            <tr>
-                <td>{{ item.start_date }}</td>
-                <td>{{ item.holding_days }}</td>
+            <tr class="{% if loop.first and request.args.get('sort_by') == 'return_desc' %}best-row{% endif %}">
+
                 <td>
                     {{ "{:,.0f}".format(item.capital) }}
                 </td>
+
+                <td>{{ item.holding_days }}</td>
 
                 <td>
                     {% if item.total_profit >= 0 %}

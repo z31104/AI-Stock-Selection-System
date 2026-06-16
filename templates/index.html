@@ -40,9 +40,15 @@
                 <div class="stat-title">排行榜第一名</div>
                 <div class="stat-value">
                     {% if top_stocks %}
-                    {{ top_stocks[0].code }}
+                    <a href="/?stock={{ top_stocks[0].code }}">
+                        {{ top_stocks[0].code }}
+                    </a>
+
                     <br>
-                    {{ top_stocks[0].name }}
+
+                    <a href="/?stock={{ top_stocks[0].code }}">
+                        {{ top_stocks[0].name }}
+                    </a>
                     {% else %}
                     尚無資料
                     {% endif %}
@@ -82,8 +88,16 @@
                     {{ loop.index }}
                     {% endif %}
                 </td>
-                <td>{{ item.code }}</td>
-                <td>{{ item.name }}</td>
+                <td>
+                    <a href="/?stock={{ item.code }}">
+                        {{ item.code }}
+                    </a>
+                </td>
+                <td>
+                    <a href="/?stock={{ item.code }}">
+                        {{ item.name }}
+                    </a>
+                </td>
                 <td>
                     {% if item.score >= 10 %}
                     <span class="profit">{{ item.score }}</span>
@@ -150,9 +164,15 @@
                 </div>
 
                 <div class="stat-value">
-                    {{ stock.code }}
+                    <a href="/?stock={{ stock.code }}">
+                        {{ stock.code }}
+                    </a>
+
                     <br>
-                    {{ stock.name }}
+
+                    <a href="/?stock={{ stock.code }}">
+                        {{ stock.name }}
+                    </a>
                 </div>
 
             </div>
@@ -160,6 +180,30 @@
             {% endfor %}
 
         </div>
+
+        <h2>📈 回測績效趨勢</h2>
+
+        <canvas id="backtestChart"></canvas>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+            new Chart(
+                document.getElementById("backtestChart"),
+                {
+                    type: "line",
+                    data: {
+                        labels: {{ chart_labels| tojson }},
+                datasets: [{
+                    label: "報酬率 (%)",
+                    data: {{ chart_values| tojson }},
+                borderWidth: 3,
+                tension: 0.3
+}]
+        }
+    }
+            );
+        </script>
 
         {% endif %}
 
