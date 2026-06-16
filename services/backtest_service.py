@@ -15,7 +15,23 @@ def get_month_stock_data(stock_code, month_date):
         "stockNo": stock_code
     }
 
-    response = requests.get(url, params=params, verify=False)
+    try:
+
+        response = requests.get(
+        url,
+        params=params,
+        verify=False,
+        timeout=10
+    )
+
+        data = response.json()
+
+    except Exception as e:
+
+        print("TWSE錯誤:", e)
+
+        return None
+
     data = response.json()
 
     if "data" not in data or len(data["data"]) == 0:
@@ -49,6 +65,9 @@ def get_backtest_data(stock_code, start_date, holding_days=30):
     dfs = []
 
     for month_date in month_list:
+        print(
+    f"下載中: {stock_code} {month_date}"
+)
         df = get_month_stock_data(stock_code, month_date)
 
         if df is not None:

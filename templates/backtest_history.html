@@ -95,10 +95,34 @@
             {% for item in records %}
             <tr>
                 <td>{{ item.start_date }}</td>
-                <td>{{ item.capital }}</td>
                 <td>{{ item.holding_days }}</td>
-                <td>{{ item.total_profit }}</td>
-                <td>{{ item.return_rate }}%</td>
+                <td>
+                    {{ "{:,.0f}".format(item.capital) }}
+                </td>
+
+                <td>
+                    {% if item.total_profit >= 0 %}
+                    <span class="profit">
+                        {{ "{:,.0f}".format(item.total_profit) }}
+                    </span>
+                    {% else %}
+                    <span class="loss">
+                        {{ "{:,.0f}".format(item.total_profit) }}
+                    </span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if item.return_rate >= 0 %}
+                    <span class="profit">
+                        {{ "%.2f"|format(item.return_rate) }}%
+                    </span>
+                    {% else %}
+                    <span class="loss">
+                        {{ "%.2f"|format(item.return_rate) }}%
+                    </span>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </table>
