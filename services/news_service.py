@@ -46,35 +46,23 @@ def analyze_news_trend(stock_code, stock_name):
     )
 
     try:
-            feed = feedparser.parse(url)
+        feed = feedparser.parse(url)
     except Exception:
-            return {
-                "news_score": 0,
-                "news_trend": "新聞中性",
-                "news_heat": "低",
-                "news_topics": "暫無明顯題材",
-                "positive_keywords": "無",
-                "negative_keywords": "無",
-                "news_advice": "新聞資料暫時無法取得，建議先以技術面判斷。",
-                "news_list": [{
-                    "title": "新聞資料暫時無法取得",
-                    "link": "#"
-                }]
-            }
+        return get_empty_news_result("新聞資料暫時無法取得，建議先以技術面判斷。")
 
     news_list = []
 
     for entry in feed.entries[:8]:
+        title = getattr(entry, "title", "")
+        link = getattr(entry, "link", "#")
+
         news_list.append({
-            "title": entry.title,
-            "link": entry.link
+            "title": title,
+            "link": link
         })
 
     if len(news_list) == 0:
-        news_list = [{
-            "title": f"{stock_name} 近期暫無明顯新聞資料",
-            "link": "#"
-        }]
+        return get_empty_news_result(f"{stock_name} 近期暫無明顯新聞資料")
 
     score = 0
     matched_positive = []
@@ -137,4 +125,20 @@ def analyze_news_trend(stock_code, stock_name):
         "negative_keywords": "、".join(set(matched_negative)) if matched_negative else "無",
         "news_advice": news_advice,
         "news_list": news_list
+    }
+
+
+def get_empty_news_result(message):
+    return {
+        "news_score": 0,
+        "news_trend": "新聞中性",
+        "news_heat": "低",
+        "news_topics": "暫無明顯題材",
+        "positive_keywords": "無",
+        "negative_keywords": "無",
+        "news_advice": message,
+        "news_list": [{
+            "title": message,
+            "link": "#"
+        }]
     }

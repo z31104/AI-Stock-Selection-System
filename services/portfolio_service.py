@@ -54,6 +54,11 @@ def allocate_portfolio(records, capital, stop_loss_rate=8, take_profit_rate=15, 
 
     for item in selected:
         ratio = item["score"] / total_score
+
+        # 限制單一股票最高配置 30%
+        if ratio > 0.3:
+            ratio = 0.3
+            
         amount = capital * ratio
         industry = item.get("industry", "未分類")
 
@@ -143,7 +148,7 @@ def allocate_portfolio(records, capital, stop_loss_rate=8, take_profit_rate=15, 
     summary = (
         "本次配置依照綜合分數進行資金分配，"
         "分數越高配置比例越高，並限制同產業最多 2 檔，"
-        "避免資金過度集中。"
+        "單一股票最高配置 30%，避免資金過度集中。"
     )
 
     return {

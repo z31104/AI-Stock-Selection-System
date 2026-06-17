@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask import send_file
 import pandas as pd
 
@@ -208,8 +208,21 @@ def ranking():
 
 @app.route("/compare")
 def compare():
+
     records = get_all_stocks()
-    return render_template("compare.html", records=records)
+
+    latest_map = {}
+
+    for item in records:
+        code = str(item.get("code", "")).replace(".0", "")
+        latest_map[code] = item
+
+    records = list(latest_map.values())
+
+    return render_template(
+        "compare.html",
+        records=records
+    )
 
 
 @app.route("/portfolio", methods=["GET", "POST"])
@@ -511,6 +524,43 @@ def export_backtest():
         file_path,
         as_attachment=True
     )
+
+
+@app.route("/api/stock/<stock_code>")
+def stock_api(stock_code):
+
+    stock_data, error = get_stock_data(stock_code)
+
+    if error:
+        return jsonify({
+            "success": False,
+            "error": error
+        })
+
+    df = stock_data["df"]
+    df = add_indicators(df)
+
+    if len(df) == 0:
+        return jsonify({
+            "success": False,
+            "error": "資料不足"
+        })
+
+    latest = df.iloc[-1]
+
+    return jsonify({
+        "success": True,
+        "code": stock_code,
+        "name": stock_data["stock_name"],
+        "price": float(latest["收盤價"]),
+        "ma5": float(latest["MA5"]),
+        "ma20": float(latest["MA20"]),
+        "rsi": float(latest["RSI"]),
+        "k": float(latest["K"]),
+        "d": float(latest["D"])
+    })
+
+
 
 if __name__ == "__main__":
     app.run(

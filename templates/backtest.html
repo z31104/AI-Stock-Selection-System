@@ -40,12 +40,12 @@
         <div class="stat-title">最佳股票</div>
         <div class="stat-value">
             {% if best_stock %}
-                {{ "%.2f"|format(best_stock.return_rate) }}%
-                <br>
-                {{ best_stock.code }}
-                {{ best_stock.name }}
+            {{ "%.2f"|format(best_stock.return_rate) }}%
+            <br>
+            {{ best_stock.code }}
+            {{ best_stock.name }}
             {% else %}
-                無獲利股票
+            無獲利股票
             {% endif %}
         </div>
     </div>
@@ -74,20 +74,20 @@
         </div>
     </div>
 
-<div class="stat-card">
-    <div class="stat-title">總損益</div>
+    <div class="stat-card">
+        <div class="stat-title">總損益</div>
 
-    <div class="stat-value
+        <div class="stat-value
         {% if total_profit < 0 %}
             loss
         {% else %}
             profit
         {% endif %}
     ">
-        {{ "{:,.0f}".format(total_profit) }}
+            {{ "{:,.0f}".format(total_profit) }}
+        </div>
     </div>
 </div>
-    </div>
 
 <div class="stat-title">回測後資產</div>
 
@@ -110,8 +110,8 @@
 <hr>
 
 <hr>
-    <h2>回測結果</h2>
-    <h3>回測績效排行榜</h3>
+<h2>回測結果</h2>
+<h3>回測績效排行榜</h3>
 
 <table border="1" cellpadding="8">
     <tr>
@@ -133,89 +133,116 @@
 
 <hr>
 
-    <p>本金：{{ capital }}</p>
-    <p>開始日期：{{ start_date }}</p>
-    <p>持有天數：{{ holding_days }}</p>
-    <p>總損益：{{ total_profit }}</p>
-    {% if portfolio_dates and portfolio_values %}
+<p>本金：{{ capital }}</p>
+<p>開始日期：{{ start_date }}</p>
+<p>持有天數：{{ holding_days }}</p>
+<p>總損益：{{ total_profit }}</p>
+{% if portfolio_dates and portfolio_values %}
 
-    <h2>投資組合資產曲線</h2>
+<h2>投資組合資產曲線</h2>
 
-    <canvas id="portfolioChart" height="100"></canvas>
+<canvas id="portfolioChart" height="100"></canvas>
 
-    <script>
+<script>
     new Chart(
         document.getElementById("portfolioChart"),
         {
             type: "line",
             data: {
-                labels: {{ portfolio_dates|tojson }},
-                datasets: [{
-                    label: "投資組合總資產",
-                    data: {{ portfolio_values|tojson }},
-                    tension: 0.3
+                labels: {{ portfolio_dates| tojson }},
+        datasets: [{
+            label: "投資組合總資產",
+            data: {{ portfolio_values| tojson }},
+        tension: 0.3
                 }]
             }
         }
     );
-    </script>
+</script>
 
 {% endif %}
 
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>股票代號</th>
-            <th>股票名稱</th>
-            <th>評分</th>
-            <th>開始價</th>
-            <th>結束價</th>
-            <th>投入金額</th>
-            <th>報酬率</th>
-            <th>期末金額</th>
-            <th>損益</th>
-            <th>配置比例</th>
-        </tr>
-
-        {% for item in results %}
-        <tr>
-            <td>{{ item.code }}</td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.score }}</td>
-            <td>{{ item.start_price }}</td>
-            <td>{{ item.end_price }}</td>
-            <td>{{ item.invest_amount }}</td>
-            <td>{{ item.return_rate }}%</td>
-            <td>{{ item.final_amount }}</td>
-            <td>{{ item.profit }}</td>
-            <td>{{ item.ratio }}%</td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    <h2>回測股價走勢圖</h2>
+<table border="1" cellpadding="8">
+    <tr>
+        <th>股票代號</th>
+        <th>股票名稱</th>
+        <th>評分</th>
+        <th>開始價</th>
+        <th>出場價</th>
+        <th>出場日期</th>
+        <th>出場原因</th>
+        <th>停損價</th>
+        <th>停利價</th>
+        <th>最大獲利%</th>
+        <th>最大虧損%</th>
+        <th>投入金額</th>
+        <th>報酬率</th>
+        <th>期末金額</th>
+        <th>損益</th>
+        <th>配置比例</th>
+    </tr>
 
     {% for item in results %}
-        <h3>{{ item.code }} {{ item.name }}</h3>
+    <tr>
+        <td>{{ item.code }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.score }}</td>
+        <td>{{ item.start_price }}</td>
+        <td>{{ item.exit_price }}</td>
+        <td>{{ item.exit_date }}</td>
+        <td>{{ item.exit_reason }}</td>
+        <td>{{ item.stop_loss_price }}</td>
+        <td>{{ item.take_profit_price }}</td>
+        <td>{{ item.max_profit_rate }}%</td>
+        <td>{{ item.max_loss_rate }}%</td>
+        <td>{{ item.invest_amount }}</td>
+        <td>{{ item.return_rate }}%</td>
+        <td>{{ item.final_amount }}</td>
+        <td>{{ item.profit }}</td>
+        <td>{{ item.ratio }}%</td>
+    </tr>
+    {% endfor %}
+</table>
+{% for item in results %}
+<tr>
+    <td>{{ item.code }}</td>
+    <td>{{ item.name }}</td>
+    <td>{{ item.score }}</td>
+    <td>{{ item.start_price }}</td>
+    <td>{{ item.end_price }}</td>
+    <td>{{ item.invest_amount }}</td>
+    <td>{{ item.return_rate }}%</td>
+    <td>{{ item.final_amount }}</td>
+    <td>{{ item.profit }}</td>
+    <td>{{ item.ratio }}%</td>
+</tr>
+{% endfor %}
+</table>
 
-        <canvas id="chart{{ loop.index }}" height="100"></canvas>
+<h2>回測股價走勢圖</h2>
 
-        <script>
-        new Chart(
-            document.getElementById("chart{{ loop.index }}"),
-            {
-                type: "line",
-                data: {
-                    labels: {{ item.dates|tojson }},
-                    datasets: [{
-                        label: "{{ item.code }} 收盤價",
-                        data: {{ item.prices|tojson }},
-                        tension: 0.3
+{% for item in results %}
+<h3>{{ item.code }} {{ item.name }}</h3>
+
+<canvas id="chart{{ loop.index }}" height="100"></canvas>
+
+<script>
+    new Chart(
+        document.getElementById("chart{{ loop.index }}"),
+        {
+            type: "line",
+            data: {
+                labels: {{ item.dates | tojson }},
+        datasets: [{
+            label: "{{ item.code }} 收盤價",
+            data: {{ item.prices | tojson }},
+        tension: 0.3
                     }]
                 }
             }
-        );
-        </script>
-    {% endfor %}
+    );
+</script>
+{% endfor %}
 
 {% endif %}
 

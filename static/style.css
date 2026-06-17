@@ -176,3 +176,80 @@ canvas {
     background-color: #fff3cd;
     font-weight: bold;
 }
+
+/* ===== 專案作品集風格 ===== */
+
+.topbar {
+    background: #111827;
+    padding: 15px 0;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.topbar-inner {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 25px;
+}
+
+.logo {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.topbar .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.topbar .nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.topbar .nav a:hover {
+    color: #60a5fa;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+table {
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+th {
+    background: #2563eb;
+    color: white;
+}
+
+tr:hover {
+    background: #f8fafc;
+}
+
+form {
+    background: white;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card {
+    transition: 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+}
+
+pre {
+    border-left: 5px solid #2563eb;
+}

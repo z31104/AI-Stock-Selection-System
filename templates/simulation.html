@@ -1,34 +1,40 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
+{% extends "base.html" %}
+
+{% block title %}
+頁面名稱
+{% endblock %}
+
+{% block content %}
+
 <head>
     <meta charset="UTF-8">
     <title>模擬投資</title>
 </head>
+
 <body>
 
-<h1>模擬投資</h1>
- <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-<div class="container"></div>
+    <h1>模擬投資</h1>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <div class="container"></div>
 
-<a href="/">回首頁</a>
-|
-<a href="/ranking">排行榜</a>
-|
-<a href="/portfolio">投資配置</a>
-|
-<a href="/backtest">回測系統</a>
+    <a href="/">回首頁</a>
+    |
+    <a href="/ranking">排行榜</a>
+    |
+    <a href="/portfolio">投資配置</a>
+    |
+    <a href="/backtest">回測系統</a>
 
-<form method="POST">
-    <p>
-        <label>本金：</label>
-        <input type="number" name="capital" value="1000000">
-    </p>
+    <form method="POST">
+        <p>
+            <label>本金：</label>
+            <input type="number" name="capital" value="1000000">
+        </p>
 
-    <button type="submit">開始模擬投資</button>
-</form>
+        <button type="submit">開始模擬投資</button>
+    </form>
 
-{% if results %}
+    {% if results %}
     <h2>模擬投資結果</h2>
 
     <p>本金：{{ capital }}</p>
@@ -58,7 +64,7 @@
         </tr>
         {% endfor %}
     </table>
-{% endif %}
+    {% endif %}
 
 </body>
-</html>
+{% endblock %}

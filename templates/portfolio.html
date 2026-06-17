@@ -1,62 +1,67 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
+{% extends "base.html" %}
+
+{% block title %}
+頁面名稱
+{% endblock %}
+
+{% block content %}
+
 <head>
     <meta charset="UTF-8">
     <title>投資配置建議</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <h1>AI 投資配置系統</h1>
+        <h1>AI 投資配置系統</h1>
 
-    <a href="/">回首頁</a>
-    |
-    <a href="/ranking">排行榜</a>
-    |
-    <a href="/compare">股票比較</a>
+        <a href="/">回首頁</a>
+        |
+        <a href="/ranking">排行榜</a>
+        |
+        <a href="/compare">股票比較</a>
 
-    <hr>
+        <hr>
 
-    <form method="POST">
+        <form method="POST">
 
-        <p>
-            <label>本金：</label>
-            <input type="number" name="capital" value="1000000" required>
-        </p>
+            <p>
+                <label>本金：</label>
+                <input type="number" name="capital" value="1000000" required>
+            </p>
 
-        <p>
-            <label>現金保留比例％：</label>
-            <input type="number" name="cash_ratio" value="10" required>
-        </p>
+            <p>
+                <label>現金保留比例％：</label>
+                <input type="number" name="cash_ratio" value="10" required>
+            </p>
 
-        <p>
-            <label>停損比例％：</label>
-            <input type="number" name="stop_loss_rate" value="8" required>
-        </p>
+            <p>
+                <label>停損比例％：</label>
+                <input type="number" name="stop_loss_rate" value="8" required>
+            </p>
 
-        <p>
-            <label>停利比例％：</label>
-            <input type="number" name="take_profit_rate" value="15" required>
-        </p>
+            <p>
+                <label>停利比例％：</label>
+                <input type="number" name="take_profit_rate" value="15" required>
+            </p>
 
-        <p>
-            <label>買進方式：</label>
-            <select name="buy_mode">
-                <option value="odd">零股</option>
-                <option value="lot">整張</option>
-            </select>
-        </p>
+            <p>
+                <label>買進方式：</label>
+                <select name="buy_mode">
+                    <option value="odd">零股</option>
+                    <option value="lot">整張</option>
+                </select>
+            </p>
 
-        <button type="submit">開始配置</button>
+            <button type="submit">開始配置</button>
 
-    </form>
+        </form>
 
-    {% if portfolio_data %}
+        {% if portfolio_data %}
 
         <hr>
 
@@ -140,9 +145,9 @@
 
         </table>
 
-    {% endif %}
+        {% endif %}
 
-</div>
+    </div>
 
 </body>
-</html>
+{% endblock %}

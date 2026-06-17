@@ -1,14 +1,20 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
+{% extends "base.html" %}
+
+{% block title %}
+頁面名稱
+{% endblock %}
+
+{% block content %}
+
 <head>
     <meta charset="UTF-8">
     <title>股票比較</title>
 </head>
+
 <body>
 
     <h1>股票比較</h1>
-     <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <div class="container"></div>
 
     <a href="/">回首頁</a>
@@ -18,48 +24,49 @@
     <a href="/portfolio">投資配置</a>
 
     <table border="1" cellpadding="8">
-    <tr>
-        <th>股票代號</th>
-        <th>股票名稱</th>
-        <th>產業</th>
-        <th>收盤價</th>
-        <th>MA5</th>
-        <th>MA20</th>
-        <th>RSI</th>
-        <th>K</th>
-        <th>D</th>
-        <th>技術分數</th>
-        <th>新聞分數</th>
-        <th>綜合分數</th>
-        <th>新聞趨勢</th>
-        <th>新聞熱度</th>
-        <th>風險等級</th>
-        <th>停損價</th>
-        <th>停利價</th>
-    </tr>
+        <tr>
+            <th>股票代號</th>
+            <th>股票名稱</th>
+            <th>產業</th>
+            <th>收盤價</th>
+            <th>MA5</th>
+            <th>MA20</th>
+            <th>RSI</th>
+            <th>K</th>
+            <th>D</th>
+            <th>技術分數</th>
+            <th>新聞分數</th>
+            <th>綜合分數</th>
+            <th>新聞趨勢</th>
+            <th>新聞熱度</th>
+            <th>風險等級</th>
+            <th>停損價</th>
+            <th>停利價</th>
+        </tr>
 
-    {% for item in records %}
-    <tr>
-        <td>{{ item.code }}</td>
-        <td>{{ item.name }}</td>
-        <td>{{ item.industry }}</td>
-        <td>{{ item.price }}</td>
-        <td>{{ item.ma5 }}</td>
-        <td>{{ item.ma20 }}</td>
-        <td>{{ item.rsi }}</td>
-        <td>{{ item.k }}</td>
-        <td>{{ item.d }}</td>
-        <td>{{ item.tech_score }}</td>
-        <td>{{ item.news_score }}</td>
-        <td>{{ item.final_score }}</td>
-        <td>{{ item.news_trend }}</td>
-        <td>{{ item.news_heat }}</td>
-        <td>{{ item.risk_level }}</td>
-        <td>{{ item.stop_loss_price }}</td>
-        <td>{{ item.take_profit_price }}</td>
-    </tr>
-    {% endfor %}
-</table>
+        {% for item in records %}
+        <tr>
+            <td>{{ item.code }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.industry }}</td>
+            <td>{{ item.price }}</td>
+            <td>{{ item.ma5 }}</td>
+            <td>{{ item.ma20 }}</td>
+            <td>{{ item.rsi }}</td>
+            <td>{{ item.k }}</td>
+            <td>{{ item.d }}</td>
+            <td>{{ item.tech_score }}</td>
+            <td>{{ item.news_score }}</td>
+            <td>{{ item.final_score }}</td>
+            <td>{{ item.news_trend }}</td>
+            <td>{{ item.news_heat }}</td>
+            <td>{{ item.risk_level }}</td>
+            <td>{{ item.stop_loss_price }}</td>
+            <td>{{ item.take_profit_price }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 
 </body>
-</html>
+
+{% endblock %}

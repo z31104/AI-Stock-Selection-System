@@ -1,55 +1,55 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
+{% extends "base.html" %}
+
+{% block title %}
+頁面名稱
+{% endblock %}
+
+{% block content %}
+
 <head>
     <meta charset="UTF-8">
     <title>AI 股票助理</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <h1>AI 股票助理</h1>
+        <h1>AI 股票助理</h1>
 
-    <a href="/">回首頁</a>
+        <a href="/">回首頁</a>
 
-    <hr>
+        <hr>
 
-    <form method="POST">
+        <form method="POST">
 
-        <p>
-            <label>請輸入問題：</label>
-        </p>
+            <p>
+                <label>請輸入問題：</label>
+            </p>
 
-        <textarea
-            name="question"
-            rows="4"
-            cols="80"
-            placeholder="例如：2330可以買嗎？"
-        ></textarea>
+            <textarea name="question" rows="4" cols="80" placeholder="例如：2330可以買嗎？"></textarea>
 
-        <br><br>
+            <br><br>
 
-        <button type="submit">
-            詢問 AI
-        </button>
+            <button type="submit">
+                詢問 AI
+            </button>
 
-    </form>
+        </form>
 
-    {% if answer %}
+        {% if answer %}
 
-    <hr>
+        <hr>
 
-    <h2>AI 回答</h2>
+        <h2>AI 回答</h2>
 
-    <pre>{{ answer }}</pre>
+        <pre>{{ answer }}</pre>
 
-    {% endif %}
+        {% endif %}
 
-</div>
+    </div>
 
 </body>
-</html>
+{% endblock %}

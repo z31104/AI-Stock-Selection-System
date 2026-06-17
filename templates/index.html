@@ -1,5 +1,10 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
+{% extends "base.html" %}
+
+{% block title %}
+首頁
+{% endblock %}
+
+{% block content %}
 
 <head>
     <meta charset="UTF-8">
@@ -215,7 +220,10 @@
             <table cellpadding="10">
                 <tr>
                     <td>股票代號：</td>
-                    <td><input type="text" name="stock"></td>
+                    <td>
+                        <input type="text" name="stock" id="stockInput">
+                        <button type="button" onclick="checkStock()">即時查詢</button>
+                    </td>
                 </tr>
 
                 <tr>
@@ -266,7 +274,7 @@
         <p>股票名稱：{{ result.name }}</p>
         <p>產業分類：{{ result.industry }}</p>
         <p>收盤價：{{ result.price }}</p>
-        <p>成交股數：{{ result.volume }}</p>
+        <p>成交張數：{{ "{:,.0f}".format(result.volume / 1000) }} 張</p>
 
         <h3>技術指標</h3>
         <p>MA5：{{ result.ma5 }}</p>
@@ -274,7 +282,7 @@
         <p>RSI：{{ result.rsi }}</p>
         <p>K值：{{ result.k }}</p>
         <p>D值：{{ result.d }}</p>
-        <p>成交量MA5：{{ result.volume_ma5 }}</p>
+        <p>成交量MA5：{{ "{:,.0f}".format(result.volume_ma5 / 1000) }} 張</p>
 
         <h3>分析結果</h3>
         <p>技術分數：{{ result.tech_score }} / 15</p>
@@ -316,7 +324,53 @@
         {% endif %}
 
     </div>
+    <div id="stockApiResult" style="margin-top:20px; padding:15px; border:1px solid #ccc;">
+        <h3>即時技術指標</h3>
+        <p id="apiStatus">請輸入股票代號後按「即時查詢」</p>
+        <p id="apiName"></p>
+        <p id="apiPrice"></p>
+        <p id="apiMA5"></p>
+        <p id="apiMA20"></p>
+        <p id="apiRSI"></p>
+        <p id="apiK"></p>
+        <p id="apiD"></p>
+    </div>
+
+    <script>
+        function checkStock() {
+            const stockCode = document.getElementById("stockInput").value.trim();
+
+            if (!stockCode) {
+                document.getElementById("apiStatus").innerText = "請先輸入股票代號";
+                return;
+            }
+
+            document.getElementById("apiStatus").innerText = "查詢中...";
+
+            fetch("/api/stock/" + stockCode)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        document.getElementById("apiStatus").innerText = "查詢失敗：" + data.error;
+                        return;
+                    }
+
+                    document.getElementById("apiStatus").innerText = "查詢成功";
+                    document.getElementById("apiName").innerText = "股票：" + data.code + " " + data.name;
+                    document.getElementById("apiPrice").innerText = "股價：" + data.price;
+                    document.getElementById("apiMA5").innerText = "MA5：" + data.ma5;
+                    document.getElementById("apiMA20").innerText = "MA20：" + data.ma20;
+                    document.getElementById("apiRSI").innerText = "RSI：" + data.rsi;
+                    document.getElementById("apiK").innerText = "K值：" + data.k;
+                    document.getElementById("apiD").innerText = "D值：" + data.d;
+                })
+                .catch(error => {
+                    document.getElementById("apiStatus").innerText = "系統錯誤，請確認 API 是否正常";
+                    console.log(error);
+                });
+        }
+    </script>
 
 </body>
 
-</html>
+{% endblock %}
