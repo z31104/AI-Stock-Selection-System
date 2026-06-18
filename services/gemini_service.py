@@ -1,35 +1,81 @@
 ﻿import os
-from google import genai
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
-def generate_gemini_analysis(prompt):
-    api_key = os.environ.get("GEMINI_API_KEY")
+def local_rule_analysis(stock_data):
+    name = stock_data.get("name", "")
+    code = stock_data.get("code", "")
+    close = stock_data.get("close", "")
+    ma5 = stock_data.get("ma5", "")
+    ma20 = stock_data.get("ma20", "")
+    rsi = stock_data.get("rsi", "")
+    score = stock_data.get("score", "")
+
+    return f"""
+【本機規則分析】
+{name}（{code}）目前收盤價 {close}
+
+技術面：
+MA5：{ma5}
+MA20：{ma20}
+RSI：{rsi}
+技術分數：{score}
+
+提醒：
+此分析僅供參考，不保證獲利。
+"""
+
+
+def generate_gemini_analysis(stock_data):
+    api_key = os.getenv("GEMINI_API_KEY")
 
     if not api_key:
-        return "Gemini API Key 尚未設定。"
+        return local_rule_analysis(stock_data)
+
+    prompt = f"""
+你是一位台股投資分析助理，請根據以下資料產生簡短股票分析。
+
+股票名稱：{stock_data.get("name")}
+股票代號：{stock_data.get("code")}
+收盤價：{stock_data.get("close")}
+MA5：{stock_data.get("ma5")}
+MA20：{stock_data.get("ma20")}
+RSI：{stock_data.get("rsi")}
+K值：{stock_data.get("k")}
+D值：{stock_data.get("d")}
+技術分數：{stock_data.get("score")}
+
+請用繁體中文回答，格式如下：
+1. 技術面分析
+2. 風險提醒
+3. 操作建議
+
+不要保證獲利。
+"""
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": prompt}
+                ]
+            }
+        ]
+    }
 
     try:
-        client = genai.Client(api_key=api_key)
+        response = requests.post(url, json=payload, timeout=20)
+        data = response.json()
 
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
-        )
+        if response.status_code != 200:
+            return local_rule_analysis(stock_data) + f"\n\nGemini AI 分析失敗：{data}"
 
-        return response.text
+        return data["candidates"][0]["content"]["parts"][0]["text"]
 
     except Exception as e:
-        error_msg = str(e)
-
-        if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
-            return "Gemini AI 今日免費額度已用完，系統暫時改用原本規則式 AI 分析。"
-
-        return f"Gemini AI 分析失敗：{error_msg}"
-
-
-if __name__ == "__main__":
-    print(
-        generate_gemini_analysis(
-            "請用繁體中文簡短分析台積電的投資風險。"
-        )
-    )
+        return local_rule_analysis(stock_data) + f"\n\nGemini AI 分析失敗：{e}"

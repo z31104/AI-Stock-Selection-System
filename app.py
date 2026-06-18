@@ -1,5 +1,5 @@
 import os
-
+from services.gemini_service import generate_gemini_analysis
 from flask import Flask, render_template, request, jsonify
 from flask import send_file
 import pandas as pd
@@ -166,6 +166,8 @@ def home():
 
                         ai_analysis = generate_ai_analysis(result)
                         result["ai_analysis"] = ai_analysis
+                        gemini_analysis = generate_gemini_analysis(result)
+                        result["gemini_analysis"] = gemini_analysis
 
                         save_stock(result)
 
