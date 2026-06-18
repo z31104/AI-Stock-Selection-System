@@ -6,7 +6,11 @@
 
 {% block content %}
 
-<h2>🏆 AI 股票排行榜</h2>
+<h2>🏆 AI 智慧股票排行榜</h2>
+
+<p>
+    依照技術分析、新聞分析與風險控管綜合評分排序
+</p>
 
 <table border="1" cellpadding="8">
     <tr>
@@ -27,7 +31,17 @@
 
     {% for item in records %}
     <tr>
-        <td>{{ loop.index }}</td>
+        <td>
+            {% if loop.index == 1 %}
+            🥇
+            {% elif loop.index == 2 %}
+            🥈
+            {% elif loop.index == 3 %}
+            🥉
+            {% else %}
+            {{ loop.index }}
+            {% endif %}
+        </td>
 
         <td>
             <a href="/?stock={{ item.code }}">
@@ -36,29 +50,40 @@
         </td>
 
         <td>{{ item.name }}</td>
-
         <td>{{ item.industry or "未知" }}</td>
-
         <td>{{ item.tech_score or 0 }}</td>
-
         <td>{{ item.news_score or 0 }}</td>
 
         <td>
-            <b>
-                {{ item.final_score or item.score or 0 }}
-            </b>
+            {% set score = item.final_score or item.score or 0 %}
+
+            {% if score >= 12 %}
+            <span style="color:green;font-weight:bold;">{{ score }}</span>
+            {% elif score >= 8 %}
+            <span style="color:orange;font-weight:bold;">{{ score }}</span>
+            {% else %}
+            <span style="color:red;font-weight:bold;">{{ score }}</span>
+            {% endif %}
         </td>
 
-        <td>{{ item.news_trend or "無資料" }}</td>
+        <td>
+            {% if item.news_trend == "新聞明顯偏正向" %}
+            🟢 {{ item.news_trend }}
+            {% elif item.news_trend == "新聞偏正向" %}
+            🟢 {{ item.news_trend }}
+            {% elif item.news_trend == "新聞中性" %}
+            🟡 {{ item.news_trend }}
+            {% elif item.news_trend %}
+            🔴 {{ item.news_trend }}
+            {% else %}
+            無資料
+            {% endif %}
+        </td>
 
         <td>{{ item.news_heat or "無資料" }}</td>
-
         <td>{{ item.risk_level or "無資料" }}</td>
-
         <td>{{ item.stop_loss_price or "-" }}</td>
-
         <td>{{ item.take_profit_price or "-" }}</td>
-
         <td>{{ item.suggestion or "-" }}</td>
     </tr>
     {% endfor %}
