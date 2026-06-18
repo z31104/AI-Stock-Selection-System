@@ -18,7 +18,10 @@ redis_client = redis.Redis(
 def get_stock_data(stock_code):
     cache_key = f"stock:{stock_code}"
 
-    cached_data = redis_client.get(cache_key)
+    try:
+        cached_data = redis_client.get(cache_key)
+    except Exception:
+        cached_data = None
 
     if cached_data:
         print(f"Redis Cache Hit: {stock_code}")
