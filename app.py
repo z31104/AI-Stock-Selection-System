@@ -1,6 +1,10 @@
+import os
+
 from flask import Flask, render_template, request, jsonify
 from flask import send_file
 import pandas as pd
+
+
 
 from services.stock_service import get_stock_data
 from services.indicator_service import add_indicators
@@ -574,8 +578,10 @@ def stock_api(stock_code):
 
 
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5001))
+
     app.run(
         host="0.0.0.0",
-        debug=True,
-        port=5001
+        debug=False,
+        port=port
     )
