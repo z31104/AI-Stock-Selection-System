@@ -151,7 +151,6 @@ docker compose down
 ## 系統頁面
 
 * 首頁
-![alt text]({4300A576-FF6B-4562-BC5B-60876B2D232E}.png)
 * 排行榜
 * 股票比較
 * 投資配置
@@ -192,3 +191,26 @@ docker compose down
 許致恩
 
 AI 智慧股票選股與投資配置系統 v2
+
+
+## 系統畫面
+
+### Dashboard
+
+![Dashboard](docs/images/dashboard.png)
+
+### 股票分析
+
+![Stock Analysis](docs/images/stock_analysis.png)
+
+### 股票排行榜
+
+![Ranking](docs/images/ranking.png)
+
+### 回測系統
+
+![Backtest](docs/images/backtest.png)
+
+### AI 選股推薦
+
+![AI Pick](docs/images/ai_pick.png)
