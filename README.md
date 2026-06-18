@@ -214,3 +214,10 @@ AI 智慧股票選股與投資配置系統 v2
 ### AI 選股推薦
 
 ![AI Pick](docs/images/ai_pick.png)
+
+
+## 系統架構圖
+
+本系統採用 Flask 作為後端框架，整合 TWSE API、Google News RSS、Redis 快取與 SQLite 資料儲存，並透過 AI Analysis Service 統整技術分析與新聞分析結果。
+
+![System Architecture](docs/images/system_architecture.png)
