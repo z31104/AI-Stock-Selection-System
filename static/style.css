@@ -253,3 +253,509 @@ form {
 pre {
     border-left: 5px solid #2563eb;
 }
+
+
+    {
+    % extends "base.html" %
+}
+
+    {
+    % block title %
+}
+
+首頁 {
+    % endblock %
+}
+
+    {
+    % block content %
+}
+
+<head><meta charset="UTF-8"><title>AI 股票選股系統</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head><body><div class="container"><h1>AI 智慧股票選股系統</h1><div class="nav"><a href="/history">查看查詢紀錄</a><a href="/ranking">查看股票排行榜</a><a href="/chat">AI股票助理</a><a href="/portfolio">投資配置</a><a href="/compare">股票比較</a><a href="/backtest">回測系統</a><a href="/simulation">模擬投資</a><a href="/ai_pick">AI 選股推薦</a></div><h2>系統 Dashboard</h2><div class="stats-container"><div class="stat-card"><div class="stat-title">目前股票數量</div><div class="stat-value"> {
+        {
+        stock_count
+    }
+}
+
+</div></div><div class="stat-card"><div class="stat-title">排行榜第一名</div><div class="stat-value"> {
+    % if top_stocks %
+}
+
+<a href="/?stock={{ top_stocks[0].code }}"> {
+        {
+        top_stocks[0].code
+    }
+}
+
+</a><br><a href="/?stock={{ top_stocks[0].code }}"> {
+        {
+        top_stocks[0].name
+    }
+}
+
+</a> {
+    % else %
+}
+
+尚無資料 {
+    % endif %
+}
+
+</div></div><div class="stat-card"><div class="stat-title">總查詢次數</div><div class="stat-value"> {
+        {
+        total_queries
+    }
+}
+
+</div></div></div><h2>🏆 今日最強股票 TOP 5</h2> {
+    % if top_stocks %
+}
+
+<table border="1" cellpadding="8"><tr><th>排名</th><th>股票代號</th><th>股票名稱</th><th>綜合分數</th></tr> {
+    % for item in top_stocks %
+}
+
+<tr><td> {
+    % if loop.index==1 %
+}
+
+🥇 {
+    % elif loop.index==2 %
+}
+
+🥈 {
+    % elif loop.index==3 %
+}
+
+🥉 {
+    % else %
+}
+
+    {
+        {
+        loop.index
+    }
+}
+
+    {
+    % endif %
+}
+
+</td><td><a href="/?stock={{ item.code }}"> {
+        {
+        item.code
+    }
+}
+
+</a></td><td><a href="/?stock={{ item.code }}"> {
+        {
+        item.name
+    }
+}
+
+</a></td><td> {
+    % if item.score>=10 %
+}
+
+<span class="profit"> {
+        {
+        item.score
+    }
+}
+
+</span> {
+    % else %
+}
+
+<span class="loss"> {
+        {
+        item.score
+    }
+}
+
+</span> {
+    % endif %
+}
+
+</td></tr> {
+    % endfor %
+}
+
+</table> {
+    % endif %
+}
+
+<h2>📈 最近一次回測</h2> {
+    % if latest_backtest %
+}
+
+<div class="stat-card"><p>開始日期： {
+        {
+        latest_backtest.start_date
+    }
+}
+
+</p><p>本金： {
+        {
+        "{:,.0f}" .format(latest_backtest.capital)
+    }
+}
+
+</p><p>持有天數： {
+        {
+        latest_backtest.holding_days
+    }
+}
+
+</p><p>總損益： {
+        {
+        "{:,.0f}" .format(latest_backtest.total_profit)
+    }
+}
+
+</p><p>報酬率： {
+        {
+        "%.2f" |format(latest_backtest.return_rate)
+    }
+}
+
+% </p></div> {
+    % else %
+}
+
+<p>目前沒有回測紀錄。</p> {
+    % endif %
+}
+
+<h2>🤖 AI 推薦股票</h2> {
+    % if ai_recommend %
+}
+
+<div class="stats-container"> {
+    % for stock in ai_recommend %
+}
+
+<div class="stat-card"><div class="stat-title">推薦股票 {
+        {
+        loop.index
+    }
+}
+
+</div><div class="stat-value"><a href="/?stock={{ stock.code }}"> {
+        {
+        stock.code
+    }
+}
+
+</a><br><a href="/?stock={{ stock.code }}"> {
+        {
+        stock.name
+    }
+}
+
+</a></div></div> {
+    % endfor %
+}
+
+</div><h2>📈 回測績效趨勢</h2><canvas id="backtestChart"></canvas><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script>new Chart(document.getElementById("backtestChart"),
+    {
+
+    type: "line",
+    data: {
+        labels: {
+                {
+                chart_labels| tojson
+            }
+        }
+
+        ,
+        datasets: [ {
+
+            label: "報酬率 (%)",
+            data: {
+                    {
+                    chart_values| tojson
+                }
+            }
+
+            ,
+            borderWidth: 3,
+            tension: 0.3
+        }
+
+        ]
+    }
+});
+
+</script> {
+    % endif %
+}
+
+<hr><hr><form method="POST"><table cellpadding="10"><tr><td>股票代號：</td><td><input type="text" name="stock" id="stockInput"><button type="button" onclick="checkStock()">即時查詢</button></td></tr><tr><td>最低評分：</td><td><input type="number" name="min_score" value="0"></td></tr><tr><td>RSI 小於：</td><td><input type="number" name="max_rsi" value="70"></td></tr><tr><td>技術條件：</td><td><label><input type="checkbox" name="above_ma5">必須站上 MA5 </label></td></tr><tr><td>自訂停損％：</td><td><input type="number" name="stop_loss_rate" value="8"></td></tr><tr><td>自訂停利％：</td><td><input type="number" name="take_profit_rate" value="15"></td></tr><tr><td></td><td><button type="submit">查詢</button></td></tr></table></form> {
+    % if error %
+}
+
+<p style="color:red;"> {
+        {
+        error
+    }
+}
+
+</p> {
+    % endif %
+}
+
+    {
+    % if result %
+}
+
+<h2>查詢結果</h2><p>股票代號： {
+        {
+        result.code
+    }
+}
+
+</p><p>股票名稱： {
+        {
+        result.name
+    }
+}
+
+</p><p>產業分類： {
+        {
+        result.industry
+    }
+}
+
+</p><p>收盤價： {
+        {
+        result.price
+    }
+}
+
+</p><p>成交張數： {
+        {
+        "{:,.0f}" .format(result.volume / 1000)
+    }
+}
+
+張</p><h3>技術指標</h3><p>MA5： {
+        {
+        result.ma5
+    }
+}
+
+</p><p>MA20： {
+        {
+        result.ma20
+    }
+}
+
+</p><p>RSI： {
+        {
+        result.rsi
+    }
+}
+
+</p><p>K值： {
+        {
+        result.k
+    }
+}
+
+</p><p>D值： {
+        {
+        result.d
+    }
+}
+
+</p><p>成交量MA5： {
+        {
+        "{:,.0f}" .format(result.volume_ma5 / 1000)
+    }
+}
+
+張</p><h3>分析結果</h3><p>技術分數： {
+        {
+        result.tech_score
+    }
+}
+
+/ 15</p><p>新聞分數： {
+        {
+        result.news_score
+    }
+}
+
+</p><p>綜合分數： {
+        {
+        result.final_score
+    }
+}
+
+</p><p>建議： {
+        {
+        result.suggestion
+    }
+}
+
+</p><h3>K線圖</h3><img src="{{ url_for('static', filename='charts/' + result.chart_file) }}" width="800"><h3>新聞趨勢分析</h3><p>新聞分數： {
+        {
+        result.news_score
+    }
+}
+
+</p><p>新聞趨勢： {
+        {
+        result.news_trend
+    }
+}
+
+</p><p>新聞熱度： {
+        {
+        result.news_heat
+    }
+}
+
+</p><p>新聞題材： {
+        {
+        result.news_topics
+    }
+}
+
+</p><p>正向關鍵字： {
+        {
+        result.positive_keywords
+    }
+}
+
+</p><p>負向關鍵字： {
+        {
+        result.negative_keywords
+    }
+}
+
+</p><p>新聞建議： {
+        {
+        result.news_advice
+    }
+}
+
+</p><h3>AI 新聞摘要</h3><pre> {
+        {
+        result.news_ai_summary
+    }
+}
+
+</pre><ul> {
+    % for news in result.news_list %
+}
+
+<li><a href="{{ news.link }}" target="_blank"> {
+        {
+        news.title
+    }
+}
+
+</a></li> {
+    % endfor %
+}
+
+</ul><h3>AI 分析文字</h3><pre> {
+        {
+        result.ai_analysis
+    }
+}
+
+</pre><h3>停損停利建議</h3><p>風險等級： {
+        {
+        result.risk_level
+    }
+}
+
+</p><p>自訂停損： {
+        {
+        result.stop_loss_price
+    }
+}
+
+元（- {
+        {
+        result.stop_loss_rate
+    }
+}
+
+%）</p><p>自訂停利： {
+        {
+        result.take_profit_price
+    }
+}
+
+元（+ {
+        {
+        result.take_profit_rate
+    }
+}
+
+%）</p><p>系統建議： {
+        {
+        result.risk_advice
+    }
+}
+
+</p> {
+    % endif %
+}
+
+</div><div id="stockApiResult" style="margin-top:20px; padding:15px; border:1px solid #ccc;"><h3>即時技術指標</h3><p id="apiStatus">請輸入股票代號後按「即時查詢」</p><p id="apiName"></p><p id="apiPrice"></p><p id="apiMA5"></p><p id="apiMA20"></p><p id="apiRSI"></p><p id="apiK"></p><p id="apiD"></p></div><script>function checkStock() {
+    const stockCode=document.getElementById("stockInput").value.trim();
+
+    if ( !stockCode) {
+        document.getElementById("apiStatus").innerText="請先輸入股票代號";
+        return;
+    }
+
+    document.getElementById("apiStatus").innerText="查詢中...";
+
+    fetch("/api/stock/" + stockCode) .then(response=> response.json()) .then(data=> {
+            if ( !data.success) {
+                document.getElementById("apiStatus").innerText="查詢失敗：" + data.error;
+                return;
+            }
+
+            document.getElementById("apiStatus").innerText="查詢成功";
+            document.getElementById("apiName").innerText="股票：" + data.code + " " + data.name;
+            document.getElementById("apiPrice").innerText="股價：" + data.price;
+            document.getElementById("apiMA5").innerText="MA5：" + data.ma5;
+            document.getElementById("apiMA20").innerText="MA20：" + data.ma20;
+            document.getElementById("apiRSI").innerText="RSI：" + data.rsi;
+            document.getElementById("apiK").innerText="K值：" + data.k;
+            document.getElementById("apiD").innerText="D值：" + data.d;
+
+        }) .catch(error=> {
+            document.getElementById("apiStatus").innerText="系統錯誤，請確認 API 是否正常";
+            console.log(error);
+        });
+}
+
+</script></body> {
+    % endblock %
+}
+
+
+
+@media (max-width: 768px) {
+
+    .stats-container {
+        flex-direction: column;
+    }
+
+    .stat-card {
+        width: 100%;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+}
