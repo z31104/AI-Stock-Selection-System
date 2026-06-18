@@ -95,12 +95,14 @@ def get_stock_data(stock_code):
         "stock_name": stock_name,
         "df": final_df.to_dict("records")
     }
-
-    redis_client.setex(
-        cache_key,
-        86400,
-        json.dumps(cache_data, ensure_ascii=False)
-    )
+    try:
+        redis_client.setex(
+            cache_key,
+            86400,
+            json.dumps(cache_data, ensure_ascii=False)
+        )
+    except Exception:
+        pass
 
     print(f"Redis Cache Save: {stock_code}")
 
