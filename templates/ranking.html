@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 
 {% block title %}
-首頁
+股票排行榜
 {% endblock %}
 
 {% block content %}
+
+<h2>🏆 AI 股票排行榜</h2>
 
 <table border="1" cellpadding="8">
     <tr>
@@ -26,18 +28,38 @@
     {% for item in records %}
     <tr>
         <td>{{ loop.index }}</td>
-        <td>{{ item.code }}</td>
+
+        <td>
+            <a href="/?stock={{ item.code }}">
+                {{ item.code }}
+            </a>
+        </td>
+
         <td>{{ item.name }}</td>
-        <td>{{ item.industry }}</td>
-        <td>{{ item.tech_score }}</td>
-        <td>{{ item.news_score }}</td>
-        <td>{{ item.final_score }}</td>
-        <td>{{ item.news_trend }}</td>
-        <td>{{ item.news_heat }}</td>
-        <td>{{ item.risk_level }}</td>
-        <td>{{ item.stop_loss_price }}</td>
-        <td>{{ item.take_profit_price }}</td>
-        <td>{{ item.suggestion }}</td>
+
+        <td>{{ item.industry or "未知" }}</td>
+
+        <td>{{ item.tech_score or 0 }}</td>
+
+        <td>{{ item.news_score or 0 }}</td>
+
+        <td>
+            <b>
+                {{ item.final_score or item.score or 0 }}
+            </b>
+        </td>
+
+        <td>{{ item.news_trend or "無資料" }}</td>
+
+        <td>{{ item.news_heat or "無資料" }}</td>
+
+        <td>{{ item.risk_level or "無資料" }}</td>
+
+        <td>{{ item.stop_loss_price or "-" }}</td>
+
+        <td>{{ item.take_profit_price or "-" }}</td>
+
+        <td>{{ item.suggestion or "-" }}</td>
     </tr>
     {% endfor %}
 </table>
