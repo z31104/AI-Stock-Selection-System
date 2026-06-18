@@ -30,6 +30,7 @@ from services.simulation_service import run_simulation
 from services.news_service import analyze_news_trend
 from services.ai_pick_service import get_ai_pick
 from services.history_service import clear_history
+from services.news_ai_service import generate_news_summary
 
 
 
@@ -113,6 +114,7 @@ def home():
                             stock_code,
                             stock_data["stock_name"]
                         )
+                        news_ai_summary = generate_news_summary(news_result)
 
                         final_score = tech_score + news_result["news_score"]
 
@@ -147,7 +149,8 @@ def home():
                             "news_topics": news_result["news_topics"],
                             "positive_keywords": news_result["positive_keywords"],
                             "negative_keywords": news_result["negative_keywords"],
-                            "news_advice": news_result["news_advice"]
+                            "news_advice": news_result["news_advice"],
+                            "news_ai_summary": news_ai_summary,
                         }
 
                         risk_advice = get_risk_advice(

@@ -303,6 +303,12 @@
         <p>負向關鍵字：{{ result.negative_keywords }}</p>
         <p>新聞建議：{{ result.news_advice }}</p>
 
+        <h3>AI 新聞摘要</h3>
+
+        <pre>
+{{ result.news_ai_summary }}
+</pre>
+
         <ul>
             {% for news in result.news_list %}
             <li>
