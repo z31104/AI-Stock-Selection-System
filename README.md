@@ -151,6 +151,7 @@ docker compose down
 ## 系統頁面
 
 * 首頁
+![alt text]({4300A576-FF6B-4562-BC5B-60876B2D232E}.png)
 * 排行榜
 * 股票比較
 * 投資配置

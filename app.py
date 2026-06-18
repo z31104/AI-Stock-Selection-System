@@ -189,10 +189,18 @@ def clear_history_route():
     clear_history()
     return render_template("history.html", records=[])
 
-
 @app.route("/ranking")
 def ranking():
     records = get_all_stocks()
+
+    latest_map = {}
+
+    for item in records:
+        code = str(item.get("code", "")).replace(".0", "")
+        item["code"] = code
+        latest_map[code] = item
+
+    records = list(latest_map.values())
 
     records = sorted(
         records,

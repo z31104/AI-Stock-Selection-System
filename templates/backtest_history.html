@@ -119,6 +119,8 @@
             {% for item in records %}
             <tr class="{% if loop.first and request.args.get('sort_by') == 'return_desc' %}best-row{% endif %}">
 
+                <td>{{ item.start_date }}</td>
+
                 <td>
                     {{ "{:,.0f}".format(item.capital) }}
                 </td>
@@ -148,6 +150,7 @@
                     </span>
                     {% endif %}
                 </td>
+
             </tr>
             {% endfor %}
         </table>
@@ -158,9 +161,4 @@
 
         {% endif %}
 
-    </div>
-
-</body>
-
-</html>
-{% endblock %}
+        {% endblock %}
