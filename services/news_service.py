@@ -38,7 +38,7 @@ def analyze_news_trend(stock_code, stock_name):
         "景氣風險": ["庫存", "下修", "衰退", "減產"]
     }
 
-    keyword = f"{stock_name} 股票"
+    keyword = f"{stock_code} {stock_name} 股票"
     url = (
         "https://news.google.com/rss/search?"
         f"q={quote(keyword)}"
@@ -142,3 +142,7 @@ def get_empty_news_result(message):
             "link": "#"
         }]
     }
+
+if __name__ == "__main__":
+    result = analyze_news_trend("2330", "台積電")
+    print(result)
