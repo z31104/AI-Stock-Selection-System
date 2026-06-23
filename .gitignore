@@ -1,15 +1,31 @@
+# Python
+
 .venv/
-__pycache__/
+**pycache**/
 *.pyc
 
-data/history.csv
-static/charts/*.png
+# IDE
 
 .vscode/
 .idea/
+
+# Environment Variables
+
+.env
+
+# Database
+
 data/*.db
 
-__pycache__/
-*.pyc
+# Generated Data
 
-.venv/
+data/history.csv
+
+# Charts
+
+static/charts/*.png
+
+# OS Files
+
+.DS_Store
+Thumbs.db
