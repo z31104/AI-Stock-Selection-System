@@ -88,6 +88,20 @@ def register():
 
     return render_template("register.html", message=message)
 
+@app.route("/line_callback", methods=["POST"])
+def line_callback():
+    data = request.get_json()
+
+    print("LINE CALLBACK DATA:", data)
+
+    try:
+        user_id = data["events"][0]["source"]["userId"]
+        print("LINE USER ID:", user_id)
+    except Exception as e:
+        print("LINE USER ID 取得失敗:", e)
+
+    return "OK"
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
