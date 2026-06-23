@@ -312,7 +312,7 @@ def clear_history_route():
 
 @app.route("/ranking")
 def ranking():
-    records = get_all_stocks()
+    records = get_latest_stocks()
 
     latest_map = {}
 
@@ -780,7 +780,15 @@ def scheduled_ai_pick_email():
             reverse=True
         )
 
-        top_stocks = records[:5]
+        unique_stocks = {}
+
+        for stock in records:
+            code = str(stock.get("code", ""))
+
+            if code not in unique_stocks:
+                unique_stocks[code] = stock
+
+        top_stocks = list(unique_stocks.values())[:5]
 
         content = "每日 AI 選股結果\n\n"
 
@@ -807,14 +815,13 @@ def scheduled_ai_pick_email():
 if __name__ == "__main__":
 
     scheduler = BackgroundScheduler()
-
     scheduler.add_job(
         scheduled_ai_pick_email,
         "cron",
         hour=18,
         minute=0
     )
-
+    
     scheduler.start()
 
     port = int(os.environ.get("PORT", 5001))
