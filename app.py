@@ -1,9 +1,12 @@
 from flask_mail import Mail, Message
+from apscheduler.schedulers.background import BackgroundScheduler
 import os
 from services.gemini_service import generate_gemini_analysis
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask import send_file
 import pandas as pd
+
+
 
 
 from services.user_service import (
@@ -695,6 +698,7 @@ def send_ai_pick_email():
 
     top_stocks = records[:5]
 
+
     content = "今日 AI 選股結果\n\n"
 
     for idx, stock in enumerate(top_stocks, start=1):
@@ -727,8 +731,54 @@ def test_email():
 
     return "Email 已送出"
 
+def scheduled_ai_pick_email():
+
+    with app.app_context():
+
+        print("排程開始執行") 
+
+        from services.email_service import send_email
+
+        records = get_all_stocks()
+
+        records = sorted(
+            records,
+            key=lambda x: float(x.get("score", 0)),
+            reverse=True
+        )
+
+        top_stocks = records[:5]
+
+        content = "每日 AI 選股結果\n\n"
+
+        for idx, stock in enumerate(top_stocks, start=1):
+            content += (
+                f"{idx}. {stock.get('code')} {stock.get('name')}\n"
+                f"綜合分數：{stock.get('score')}\n\n"
+            )
+
+        send_email(
+            mail,
+            "103405122a@gmail.com",
+            "AI Stock Daily Pick",
+            content
+        )
+
+        print("每日 AI 選股 Email 已送出")
 
 if __name__ == "__main__":
+
+    scheduler = BackgroundScheduler()
+
+    scheduler.add_job(
+        scheduled_ai_pick_email,
+        "cron",
+        hour=18,
+        minute=0
+    )
+
+    scheduler.start()
+
     port = int(os.environ.get("PORT", 5001))
 
     app.run(
