@@ -92,13 +92,13 @@ def register():
 def line_callback():
     data = request.get_json()
 
-    print("LINE CALLBACK DATA:", data)
+    user_id = ""
 
     try:
         user_id = data["events"][0]["source"]["userId"]
-        print("LINE USER ID:", user_id)
+        print("LINE USER ID =", user_id, flush=True)
     except Exception as e:
-        print("LINE USER ID 取得失敗:", e)
+        print("LINE USER ID 取得失敗 =", e, flush=True)
 
     return "OK"
 
