@@ -88,6 +88,19 @@ def register():
 
     return render_template("register.html", message=message)
 
+@app.route("/test_line")
+def test_line():
+    from services.line_service import send_line_message
+
+    user_id = os.getenv("LINE_USER_ID")
+
+    status_code, text = send_line_message(
+        user_id,
+        "AI 股票系統 LINE 測試成功"
+    )
+
+    return f"LINE 發送結果：{status_code} {text}"
+
 @app.route("/line_callback", methods=["POST"])
 def line_callback():
     data = request.get_json()
@@ -780,6 +793,12 @@ def scheduled_ai_pick_email():
             mail,
             "103405122a@gmail.com",
             "AI Stock Daily Pick",
+            content
+        )
+        from services.line_service import send_line_message
+
+        send_line_message(
+            os.getenv("LINE_USER_ID"),
             content
         )
 
