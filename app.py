@@ -767,9 +767,10 @@ def scheduled_ai_pick_email():
 
     with app.app_context():
 
-        print("排程開始執行") 
+        print("排程開始執行")
 
         from services.email_service import send_email
+        from services.line_service import send_line_message
 
         records = get_all_stocks()
 
@@ -795,14 +796,13 @@ def scheduled_ai_pick_email():
             "AI Stock Daily Pick",
             content
         )
-        from services.line_service import send_line_message
 
         send_line_message(
             os.getenv("LINE_USER_ID"),
             content
         )
 
-        print("每日 AI 選股 Email 已送出")
+        print("每日 AI 選股 Email 與 LINE 已送出")
 
 if __name__ == "__main__":
 
