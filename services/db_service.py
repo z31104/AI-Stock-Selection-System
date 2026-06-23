@@ -9,12 +9,12 @@ def init_db():
     os.makedirs("data", exist_ok=True)
 
     conn = sqlite3.connect(DB_PATH)
-    
     cursor = conn.cursor()
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS stock_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
             code TEXT,
             name TEXT,
             industry TEXT,
@@ -44,6 +44,15 @@ def init_db():
         )
     """)
 
+    cursor.execute("PRAGMA table_info(stock_history)")
+    columns = [column[1] for column in cursor.fetchall()]
+
+    if "user_id" not in columns:
+        cursor.execute("""
+            ALTER TABLE stock_history
+            ADD COLUMN user_id INTEGER
+        """)
+
     conn.commit()
     conn.close()
 
@@ -54,6 +63,7 @@ def save_stock(result):
 
     cursor.execute("""
         INSERT INTO stock_history (
+            user_id,
             code,
             name,
             industry,
@@ -83,9 +93,10 @@ def save_stock(result):
         VALUES (
             ?,?,?,?,?,?,?,?,?,?,
             ?,?,?,?,?,?,?,?,?,?,
-            ?,?,?,?,?
+            ?,?,?,?,?,?
         )
     """, (
+        result.get("user_id", None),
         result.get("code", ""),
         result.get("name", ""),
         result.get("industry", ""),
@@ -117,46 +128,57 @@ def save_stock(result):
     conn.close()
 
 
-def get_all_stocks():
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
+def get_all_stocks(user_id=None):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
 
-        cursor = conn.cursor()
-
+    if user_id:
+        cursor.execute("""
+            SELECT *
+            FROM stock_history
+            WHERE user_id = ?
+            ORDER BY id DESC
+        """, (user_id,))
+    else:
         cursor.execute("""
             SELECT *
             FROM stock_history
             ORDER BY id DESC
         """)
 
-        rows = cursor.fetchall()
+    rows = cursor.fetchall()
+    conn.close()
 
-        conn.close()
+    return [dict(row) for row in rows]
 
-        return [dict(row) for row in rows]
 
-def get_latest_stocks():
+def get_latest_stocks(user_id=None):
     conn = sqlite3.connect(DB_PATH)
-
     conn.row_factory = sqlite3.Row
-
     cursor = conn.cursor()
 
-    cursor.execute("""
-        SELECT *
-        FROM stock_history
-        ORDER BY id DESC
-    """)
+    if user_id:
+        cursor.execute("""
+            SELECT *
+            FROM stock_history
+            WHERE user_id = ?
+            ORDER BY id DESC
+        """, (user_id,))
+    else:
+        cursor.execute("""
+            SELECT *
+            FROM stock_history
+            ORDER BY id DESC
+        """)
 
     rows = cursor.fetchall()
-
     conn.close()
 
     latest_map = {}
 
     for row in rows:
         item = dict(row)
-
         code = str(item.get("code", ""))
 
         if code not in latest_map:

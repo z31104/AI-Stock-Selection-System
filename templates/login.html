@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>會員登入</h2>
+
+<form method="POST">
+
+    <p>帳號</p>
+    <input type="text" name="username">
+
+    <p>密碼</p>
+    <input type="password" name="password">
+
+    <br><br>
+
+    <button type="submit">
+        登入
+    </button>
+
+</form>
+
+{% if message %}
+<p>{{ message }}</p>
+{% endif %}
+
+{% endblock %}

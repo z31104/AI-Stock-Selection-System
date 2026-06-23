@@ -1,9 +1,16 @@
+from flask_mail import Mail, Message
 import os
 from services.gemini_service import generate_gemini_analysis
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask import send_file
 import pandas as pd
 
+
+from services.user_service import (
+    init_user_db,
+    register_user,
+    login_user
+)
 
 
 from services.stock_service import get_stock_data
@@ -39,7 +46,65 @@ from services.news_ai_service import generate_news_summary
 
 
 app = Flask(__name__)
+app.secret_key = "stock_ai_secret_key"
+
 init_db()
+init_user_db()
+
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+
+app.config["MAIL_USERNAME"] = "103405122a@gmail.com"
+app.config["MAIL_PASSWORD"] = "bdkqczqwcpwxnnhc"
+
+app.config["MAIL_DEFAULT_SENDER"] = app.config["MAIL_USERNAME"]
+
+mail = Mail(app)
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    message = None
+
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
+
+        if username == "" or password == "":
+            message = "請輸入帳號與密碼"
+        else:
+            success, message = register_user(username, password)
+
+            if success:
+                return redirect(url_for("login"))
+
+    return render_template("register.html", message=message)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    message = None
+
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
+
+        success, message, user = login_user(username, password)
+
+        if success:
+            session["user_id"] = user["id"]
+            session["username"] = user["username"]
+            return redirect(url_for("home"))
+
+    return render_template("login.html", message=message)
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("home"))
+
+
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -164,11 +229,20 @@ def home():
                         )
                         result.update(risk_advice)
 
-                        ai_analysis = generate_ai_analysis(result)
-                        result["ai_analysis"] = ai_analysis
-                        gemini_analysis = generate_gemini_analysis(result)
-                        result["gemini_analysis"] = gemini_analysis
+                        if session.get("user_id"):
 
+                            ai_analysis = generate_ai_analysis(result)
+                            result["ai_analysis"] = ai_analysis
+
+                            gemini_analysis = generate_gemini_analysis(result)
+                            result["gemini_analysis"] = gemini_analysis
+
+                        else:
+
+                            result["ai_analysis"] = "請先登入會員"
+                            result["gemini_analysis"] = "請先登入會員"
+
+                        result["user_id"] = session.get("user_id")
                         save_stock(result)
 
                     else:
@@ -189,7 +263,10 @@ def home():
 
 @app.route("/history")
 def history():
-    records = get_latest_stocks()
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    records = get_latest_stocks(session.get("user_id"))
     return render_template("history.html", records=records)
 
 
@@ -244,6 +321,9 @@ def compare():
 
 @app.route("/portfolio", methods=["GET", "POST"])
 def portfolio():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))   
+
     portfolio_data = None
     capital = None
 
@@ -287,6 +367,9 @@ def portfolio():
 
 @app.route("/backtest", methods=["GET", "POST"])
 def backtest():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
     results = None
     total_profit = None
     capital = None
@@ -382,6 +465,9 @@ def backtest():
 
 @app.route("/simulation", methods=["GET", "POST"])
 def simulation():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
     results = None
     capital = None
 
@@ -400,6 +486,10 @@ def simulation():
 
 @app.route("/ai_pick", methods=["GET", "POST"])
 def ai_pick():
+
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
     ai_result = None
     capital = None
     pdf_file = None
@@ -428,6 +518,13 @@ def ai_pick():
 def chat():
 
     answer = None
+
+    if not session.get("user_id"):
+        answer = "請先登入會員，才能使用 AI 股票助理。"
+        return render_template(
+            "chat.html",
+            answer=answer
+        )
 
     if request.method == "POST":
 
@@ -577,6 +674,58 @@ def stock_api(stock_code):
         "d": float(latest["D"])
     })
 
+
+@app.route("/send_ai_pick_email")
+def send_ai_pick_email():
+
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    from services.email_service import send_email
+
+    records = get_all_stocks(session.get("user_id"))
+
+    print("records=", records)
+
+    records = sorted(
+        records,
+        key=lambda x: float(x.get("score", 0)),
+        reverse=True
+    )           
+
+    top_stocks = records[:5]
+
+    content = "今日 AI 選股結果\n\n"
+
+    for idx, stock in enumerate(top_stocks, start=1):
+        content += (
+            f"{idx}. {stock['code']} {stock['name']}\n"
+            f"綜合分數：{stock['score']}\n"
+            f"產業：{stock['industry']}\n\n"
+        )
+
+    send_email(
+        mail,
+        "103405122a@gmail.com",
+        "AI 股票系統 - 今日選股",
+        content
+    )
+
+    return "AI選股Email已送出"
+
+@app.route("/test_email")
+def test_email():
+
+    from services.email_service import send_email
+
+    send_email(
+        mail,
+        "103405122a@gmail.com",
+        "AI Stock System Test",
+        "Hello, this is a test email."
+    )
+
+    return "Email 已送出"
 
 
 if __name__ == "__main__":
