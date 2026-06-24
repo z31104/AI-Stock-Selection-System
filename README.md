@@ -295,9 +295,6 @@ AI 智慧股票選股與投資配置系統 v2.1
 
 ![AI Pick](docs/images/ai_pick.png)
 
-### 系統架構圖
-
-![System Architecture](docs/images/system_architecture.png)
 
 ### 會員登入
 
