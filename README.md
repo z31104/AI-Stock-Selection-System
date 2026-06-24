@@ -224,37 +224,45 @@ docker compose down
 
 ## 已完成功能
 
-### 第一階段
+### 第一階段：Gemini AI 分析
 
 * Gemini AI 分析
-* 本機 AI 備援分析
+* 本機規則分析備援機制
+* 技術面分析（MA5、MA20、RSI、KD）
+* 新聞分析整合
+* AI 綜合投資建議
+* 風險評估分析
 
-### 第二階段
+### 第二階段：會員系統
 
 * 會員註冊
 * 會員登入
 * 會員登出
 * Session 管理
-* 個人查詢紀錄
+* 會員權限驗證
+* 個人查詢紀錄管理
 
-### 第三階段
+### 第三階段：通知系統
 
 * Email 通知系統
-* AI 選股寄信
-* APScheduler 自動寄信
+* LINE 通知系統
+* AI 選股通知
+* APScheduler 自動排程
 * 每日 18:00 自動通知
+* Render 雲端排程執行
 
 ---
 
 ## 未來規劃
 
-* LINE Messaging API 通知
+* 個人化 LINE 通知
 * 個人化 Email 通知
 * 美股支援
 * ETF 智慧配置
-* Render 雲端部署優化
+* 停損停利即時通知
 * 行動版介面優化
 * RAG 股票知識庫
+* AI 個人化投資推薦
 
 ---
 
@@ -262,10 +270,9 @@ docker compose down
 
 許致恩
 
-AI 智慧股票選股與投資配置系統 v2.0
+AI 智慧股票選股與投資配置系統 v2.1
 
 ---
-
 ## 系統畫面
 
 ### Dashboard
@@ -288,11 +295,40 @@ AI 智慧股票選股與投資配置系統 v2.0
 
 ![AI Pick](docs/images/ai_pick.png)
 
----
+### 系統架構圖
+
+![System Architecture](docs/images/system_architecture.png)
+
+### 會員登入
+
+![Login](docs/images/login.png)
+
+### 會員註冊
+
+![Register](docs/images/register.png)
+
+### LINE 通知
+
+![LINE Notification](docs/images/line_notification.png)
+
+### Email 通知
+
+![Email Notification](docs/images/email_notification.png)
+
+### AI 股票助理
+
+![Chat Assistant](docs/images/chat_assistant.png)
+
+### Gemini AI 分析
+
+![Gemini Analysis](docs/images/gemini_analysis.png)
+
 
 ## 系統架構圖
 
-本系統採用 Flask 作為後端框架，整合 TWSE API、Google News RSS、Redis 快取、SQLite 資料儲存、Gemini AI 分析服務、會員系統與 Email 通知模組，並透過 AI Analysis Service 統整技術分析與新聞分析結果。
+本系統採用 Flask 作為後端框架，整合台灣證券交易所（TWSE）API、Google News RSS、Redis 快取、SQLite 資料庫、Gemini AI 分析服務、會員系統、Email 通知系統與 LINE Messaging API 通知服務。
+
+系統透過 AI Analysis Service 整合技術分析、新聞分析與風險分析結果，並透過 APScheduler 自動排程每日選股通知。
 
 ![System Architecture](docs/images/system_architecture.png)
 
@@ -301,3 +337,20 @@ AI 智慧股票選股與投資配置系統 v2.0
 ## 線上 Demo
 
 https://ai-stock-selection-system.onrender.com
+
+---
+
+## Release Version
+
+### v2.0
+
+* Gemini AI 分析
+* 會員系統
+* Email 通知
+
+### v2.1
+
+* LINE Messaging API 通知
+* APScheduler 每日自動通知
+* Render 雲端排程通知
+
