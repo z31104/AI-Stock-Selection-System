@@ -275,6 +275,17 @@ docker compose down
 
 ---
 
+## 專案成果
+
+- 完成 Gemini AI 股票分析整合
+- 完成會員系統開發
+- 完成 Email 自動通知
+- 完成 LINE Messaging API 通知
+- 完成 Docker 容器化部署
+- 完成 Render 雲端部署
+- 完成 AI 股票助理
+- 完成歷史回測系統
+
 ## 作者
 
 許致恩
@@ -333,7 +344,7 @@ AI 智慧股票選股與投資配置系統 v2.1
 
 ## 線上 Demo
 
-https://ai-stock-selection-system.onrender.com
+[線上 Demo](https://ai-stock-selection-system.onrender.com)
 
 ---
 
