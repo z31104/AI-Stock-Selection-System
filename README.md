@@ -8,6 +8,15 @@
 
 ---
 
+## 系統架構圖
+
+本系統採用 Flask 作為後端框架，整合台灣證券交易所（TWSE）API、Google News RSS、Redis 快取、SQLite 資料庫、Gemini AI 分析服務、會員系統、Email 通知系統與 LINE Messaging API 通知服務。
+
+系統透過 AI Analysis Service 整合技術分析、新聞分析與風險分析結果，並透過 APScheduler 自動排程每日選股通知。
+
+![System Architecture](docs/images/system_architecture.png)
+
+
 ## 技術架構
 
 ### 後端
@@ -319,15 +328,6 @@ AI 智慧股票選股與投資配置系統 v2.1
 ### Gemini AI 分析
 
 ![Gemini Analysis](docs/images/gemini_analysis.png)
-
-
-## 系統架構圖
-
-本系統採用 Flask 作為後端框架，整合台灣證券交易所（TWSE）API、Google News RSS、Redis 快取、SQLite 資料庫、Gemini AI 分析服務、會員系統、Email 通知系統與 LINE Messaging API 通知服務。
-
-系統透過 AI Analysis Service 整合技術分析、新聞分析與風險分析結果，並透過 APScheduler 自動排程每日選股通知。
-
-![System Architecture](docs/images/system_architecture.png)
 
 ---
 
