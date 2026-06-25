@@ -1,4 +1,4 @@
-﻿import os
+import os
 import requests
 from dotenv import load_dotenv
 
@@ -73,9 +73,15 @@ D值：{stock_data.get("d")}
         data = response.json()
 
         if response.status_code != 200:
-            return local_rule_analysis(stock_data) + f"\n\nGemini AI 分析失敗：{data}"
+            error_code = data.get("error", {}).get("code")      
+            error_status = data.get("error", {}).get("status")
+
+            if error_code == 429 or error_status == "RESOURCE_EXHAUSTED":
+                return local_rule_analysis(stock_data) + "\n\n⚠️ Gemini AI 額度不足，已改用本機規則分析。"
+
+            return local_rule_analysis(stock_data) + "\n\n⚠️ Gemini AI 暫時無法使用，已改用本機規則分析。"
 
         return data["candidates"][0]["content"]["parts"][0]["text"]
 
-    except Exception as e:
-        return local_rule_analysis(stock_data) + f"\n\nGemini AI 分析失敗：{e}"
+    except Exception:
+        return local_rule_analysis(stock_data) + "\n\n⚠️ Gemini AI 連線失敗，已改用本機規則分析。"  
